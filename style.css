@@ -1,0 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+.toast { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateX(150%); }
+.toast.show { transform: translateX(0); }
+.bg-corporativo { background: radial-gradient(circle at top right, #0f172a, #1e293b); }
+.custom-scroll::-webkit-scrollbar { width: 5px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
