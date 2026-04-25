@@ -3,96 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA PV-2026 | Enterprise Control</title>
+    <title>PV-2026 | Gestão Escolar Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-100 text-slate-900 min-h-screen flex items-center justify-center p-4">
-    
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
+
     <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-3"></div>
 
-    <div id="telaLogin" class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
-        <div class="mb-6 inline-flex p-4 rounded-full bg-slate-100 text-slate-800">
-            <i data-lucide="shield-check" class="w-10 h-10"></i>
-        </div>
-        <h1 class="text-2xl font-black mb-2 uppercase tracking-tighter">PV-2026 Login</h1>
-        <p class="text-slate-500 text-sm mb-8">Acesse o painel administrativo</p>
-
-        <form id="loginForm" class="space-y-4">
-            <input type="text" id="loginUser" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 ring-slate-800" required>
-            <input type="password" id="loginPass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 ring-slate-800" required>
-            <button type="submit" class="w-full py-4 rounded-2xl bg-slate-900 text-white font-bold uppercase tracking-widest hover:bg-black transition-colors">Entrar</button>
-        </form>
-    </div>
-
-    <div id="app" class="hidden w-full max-w-5xl bg-white p-6 md:p-8 rounded-[2.5rem] shadow-2xl">
-        
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <nav class="flex bg-slate-100 p-1 rounded-2xl w-full md:w-auto">
-                <button onclick="switchTab('tab-funcionarios')" class="tab-btn active-tab px-6 py-2 rounded-xl text-xs font-bold uppercase transition-all">Funcionários</button>
-                <button onclick="switchTab('tab-registro')" class="tab-btn px-6 py-2 rounded-xl text-xs font-bold uppercase transition-all">Registrar Ponto</button>
-                <button onclick="switchTab('tab-historico')" class="tab-btn px-6 py-2 rounded-xl text-xs font-bold uppercase transition-all">Histórico</button>
-            </nav>
-            <div class="flex items-center gap-4">
-                <span id="userStatus" class="text-[10px] font-black text-slate-400 uppercase"></span>
-                <button onclick="logout()" class="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100"><i data-lucide="log-out"></i></button>
-            </div>
-        </div>
-
-        <div id="tab-funcionarios" class="tab-content grid md:grid-cols-2 gap-8">
-            <div class="space-y-4">
-                <h3 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Novo Cadastro</h3>
-                <form id="registerForm" class="space-y-3">
-                    <input type="text" id="regUser" placeholder="Nome de Usuário" class="w-full p-3 rounded-xl bg-slate-50 border border-slate-100 outline-none">
-                    <input type="password" id="regPass" placeholder="Senha" class="w-full p-3 rounded-xl bg-slate-50 border border-slate-100 outline-none">
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="regRole" class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold">
-                            <option value="user">Comum</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                        <input type="time" id="regTime" value="08:00" class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold">
-                    </div>
-                    <button type="submit" class="w-full py-3 rounded-xl bg-slate-800 text-white font-bold text-xs uppercase hover:bg-slate-700">Cadastrar</button>
-                </form>
-            </div>
-            <div class="space-y-4">
-                <h3 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Lista de Acessos</h3>
-                <div class="overflow-hidden rounded-2xl border border-slate-100">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 text-[10px] uppercase text-slate-400">
-                            <tr><th class="p-3">User</th><th class="p-3">Entrada</th><th class="p-3">Ação</th></tr>
-                        </thead>
-                        <tbody id="userList" class="text-sm"></tbody>
-                    </table>
+    <div id="authSection" class="min-h-screen flex items-center justify-center p-4 bg-slate-900">
+        <div class="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-10">
+            <div class="text-center mb-8">
+                <div class="inline-flex p-4 rounded-3xl bg-indigo-50 text-indigo-600 mb-4">
+                    <i data-lucide="graduation-cap" class="w-10 h-10"></i>
+                </div>
+                <h1 class="text-2xl font-black uppercase tracking-tighter">PV-2026 Gestão</h1>
+                <div class="flex justify-center gap-4 mt-4">
+                    <button onclick="toggleAuth(true)" id="btnShowLogin" class="text-sm font-bold border-b-2 border-indigo-600 pb-1">LOGIN</button>
+                    <button onclick="toggleAuth(false)" id="btnShowReg" class="text-sm font-bold text-slate-400 pb-1">REGISTRO</button>
                 </div>
             </div>
-        </div>
 
-        <div id="tab-registro" class="tab-content hidden py-10 text-center">
-            <h3 class="text-xl font-black uppercase mb-2">Painel de Presença</h3>
-            <div id="relogio" class="text-5xl font-mono font-bold mb-8 text-slate-800">00:00:00</div>
-            <button onclick="baterPonto()" class="max-w-xs w-full py-6 rounded-[2rem] bg-indigo-600 text-white font-black text-lg shadow-xl shadow-indigo-100 hover:scale-[1.02] active:scale-95 transition-all">
-                REGISTRAR ENTRADA
-            </button>
-        </div>
+            <form id="loginForm" class="space-y-4">
+                <input type="text" id="loginUser" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 ring-indigo-500">
+                <input type="password" id="loginPass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 ring-indigo-500">
+                <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">Acessar Sistema</button>
+            </form>
 
-        <div id="tab-historico" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Logs de Presença</h3>
-                <button onclick="gerarPDF()" class="bg-green-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase hover:bg-green-700">Baixar Relatório</button>
-            </div>
-            <div class="overflow-hidden rounded-2xl border border-slate-100">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] uppercase text-slate-400">
-                        <tr><th class="p-3">Funcionário</th><th class="p-3">Data/Hora</th><th class="p-3">Status</th></tr>
-                    </thead>
-                    <tbody id="historyList" class="text-sm"></tbody>
-                </table>
-            </div>
+            <form id="registerForm" class="space-y-4 hidden">
+                <input type="text" id="regUser" placeholder="Definir Usuário" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
+                <input type="password" id="regPass" placeholder="Definir Senha" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
+                <button type="submit" class="w-full py-4 rounded-2xl bg-slate-800 text-white font-black uppercase tracking-widest hover:bg-black transition-all">Criar Conta de Gestão</button>
+            </form>
         </div>
+    </div>
+
+    <div id="mainDashboard" class="hidden min-h-screen p-4 md:p-8">
+        <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="flex items-center gap-4 bg-white p-2 rounded-3xl shadow-sm pr-6">
+                <nav class="flex gap-2">
+                    <button onclick="navTo('aba-alunos')" class="nav-btn active px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Alunos</button>
+                    <button onclick="navTo('aba-atrasos')" class="nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Atrasos</button>
+                    <button onclick="navTo('aba-historico')" class="nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Histórico</button>
+                    <button id="navAdmin" onclick="navTo('aba-admin')" class="hidden nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase bg-red-50 text-red-600">Admin</button>
+                </nav>
+            </div>
+            <button onclick="logout()" class="p-4 rounded-2xl bg-white text-red-500 shadow-sm hover:bg-red-50 transition-all"><i data-lucide="log-out"></i></button>
+        </header>
+
+        <main class="max-w-7xl mx-auto bg-white rounded-[3rem] shadow-xl p-8 min-h-[70vh]">
+            
+            <section id="aba-alunos" class="tab-content">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="md:col-span-1 space-y-6">
+                        <h2 class="text-xl font-black uppercase tracking-tighter italic">Matrícula de Aluno</h2>
+                        <form id="formAluno" class="space-y-3">
+                            <input type="text" id="alunoNome" placeholder="Nome Completo" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="alunoSerie" placeholder="Série (ex: 9º)" class="p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none">
+                                <input type="text" id="alunoTurma" placeholder="Turma (ex: A)" class="p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none">
+                            </div>
+                            <select id="alunoPeriodo" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none font-bold text-slate-500">
+                                <option value="Manhã">Período: Manhã</option>
+                                <option value="Tarde">Período: Tarde</option>
+                            </select>
+                            <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase text-xs">Confirmar Matrícula</button>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h2 class="text-xl font-black uppercase tracking-tighter mb-6 italic">Corpo Discente</h2>
+                        <div class="overflow-hidden rounded-3xl border border-slate-100">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400">
+                                    <tr><th class="p-4">Aluno</th><th class="p-4">Série/Turma</th><th class="p-4">Período</th><th class="p-4 text-right">Ação</th></tr>
+                                </thead>
+                                <tbody id="listaAlunos" class="text-sm font-medium"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="aba-atrasos" class="tab-content hidden">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="space-y-8">
+                        <div class="flex justify-between items-end border-b pb-4">
+                            <div>
+                                <p id="dataAtual" class="text-xs font-black text-indigo-500 uppercase"></p>
+                                <h2 id="horaAtual" class="text-5xl font-black text-slate-800 tabular-nums">00:00:00</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="text-xs font-black uppercase text-slate-400">Pesquisar Aluno p/ Atraso</label>
+                            <div class="relative">
+                                <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="Digite o nome..." class="w-full p-5 rounded-3xl bg-slate-100 border-none outline-none focus:ring-2 ring-indigo-500">
+                                <div id="resultadoBusca" class="absolute top-full left-0 right-0 bg-white shadow-2xl rounded-3xl mt-2 z-50 overflow-hidden hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="formAtrasoContainer" class="hidden animate-in fade-in slide-in-from-bottom-4">
+                        <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-200">
+                            <h3 id="nomeAlunoSelecionado" class="text-lg font-black uppercase mb-6 text-indigo-600"></h3>
+                            <div class="space-y-4">
+                                <p class="text-[10px] font-black uppercase text-slate-400">Motivo do Atraso:</p>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <label class="checkbox-card"><input type="radio" name="motivo" value="Circular"> <span>Atraso de Circular</span></label>
+                                    <label class="checkbox-card"><input type="radio" name="motivo" value="Médico"> <span>Consulta Médica</span></label>
+                                    <label class="checkbox-card"><input type="radio" name="motivo" value="Pessoal"> <span>Assuntos Pessoais</span></label>
+                                    <label class="checkbox-card"><input type="radio" name="motivo" value="Outros" id="checkOutros"> <span>Outros (Justificar)</span></label>
+                                </div>
+                                <textarea id="justificativa" placeholder="Escreva a justificativa aqui..." class="w-full p-4 rounded-2xl border-none bg-white shadow-inner hidden h-24 outline-none"></textarea>
+                                <button onclick="salvarAtraso()" class="w-full py-5 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-tighter">Validar Entrada</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="aba-historico" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-black uppercase italic">Livro de Ocorrências</h2>
+                    <button onclick="exportarPDF()" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-green-600 text-white font-bold text-xs hover:bg-green-700">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> GERAR PLANILHA PDF
+                    </button>
+                </div>
+                <div class="overflow-x-auto rounded-[2rem] border border-slate-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-900 text-white text-[10px] uppercase">
+                            <tr><th class="p-4">Data</th><th class="p-4">Hora</th><th class="p-4">Aluno</th><th class="p-4">Série</th><th class="p-4">Motivo</th><th class="p-4">Justificativa</th></tr>
+                        </thead>
+                        <tbody id="tabelaHistorico" class="text-sm font-medium"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="aba-admin" class="tab-content hidden">
+                <h2 class="text-2xl font-black uppercase text-red-600 mb-8 tracking-tighter">Gestão de Acessos Administrativos</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-red-50 p-8 rounded-[2.5rem] border border-red-100">
+                        <p class="text-xs font-bold text-red-500 mb-4 uppercase">Atenção</p>
+                        <p class="text-sm text-red-800 leading-relaxed font-medium">Você está visualizando todos os funcionários com acesso ao sistema. A exclusão de um usuário impedirá o acesso dele imediatamente.</p>
+                    </div>
+                    <div class="overflow-hidden rounded-[2rem] border border-slate-100">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-[10px] uppercase text-slate-400">
+                                <tr><th class="p-4">Usuário Gestor</th><th class="p-4 text-right">Ação</th></tr>
+                            </thead>
+                            <tbody id="listaGestores"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script src="script.js"></script>
