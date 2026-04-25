@@ -5,22 +5,33 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarUsuarios();
 });
 
-// SISTEMA DE NOTIFICAÇÃO (TOAST)
+// NAVEGAÇÃO ENTRE ABAS
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+    
+    document.getElementById(tabId).classList.remove('hidden');
+    event.currentTarget.classList.add('active-tab');
+
+    if(tabId === 'tab-historico') carregarHistorico();
+}
+
+// RELÓGIO
+setInterval(() => {
+    const el = document.getElementById('relogio');
+    if(el) el.innerText = new Date().toLocaleTimeString('pt-br');
+}, 1000);
+
+// NOTIFICAÇÕES (TOAST)
 function showToast(msg, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     const color = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-800';
-    
-    toast.className = `${color} text-white px-6 py-4 rounded-2xl shadow-xl animate-in slide-in-from-right-10 duration-300 font-bold text-xs uppercase flex items-center gap-3`;
+    toast.className = `${color} text-white px-6 py-4 rounded-2xl shadow-xl font-bold text-xs uppercase flex items-center gap-3 animate-bounce-short`;
     toast.innerHTML = `<i data-lucide="bell" class="w-4 h-4"></i> ${msg}`;
-    
     container.appendChild(toast);
     lucide.createIcons();
-    
-    setTimeout(() => {
-        toast.classList.add('animate-out', 'fade-out', 'slide-out-to-right-10');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    setTimeout(() => toast.remove(), 3000);
 }
 
 // LOGIN
@@ -28,106 +39,103 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const user = document.getElementById('loginUser').value;
     const pass = document.getElementById('loginPass').value;
-
     const dados = JSON.parse(localStorage.getItem('pv_user_' + user));
 
     if ((user === 'admin' && pass === 'admin') || (dados && dados.pass === pass)) {
-        currentUser = dados || { user: 'admin', role: 'admin' };
-        entrarNoSistema();
+        currentUser = dados || { user: 'admin', role: 'admin', entryTime: '08:00' };
+        document.getElementById('telaLogin').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('userStatus').innerText = currentUser.user;
+        showToast(`Bem-vindo, ${user}!`, 'success');
     } else {
-        showToast('Credenciais Inválidas', 'error');
+        showToast('Acesso Negado', 'error');
     }
 });
 
-// REGISTRO
+// REGISTRO DE FUNCIONÁRIO
 document.getElementById('registerForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const user = document.getElementById('regUser').value;
     const pass = document.getElementById('regPass').value;
     const role = document.getElementById('regRole').value;
+    const time = document.getElementById('regTime').value;
 
-    if (localStorage.getItem('pv_user_' + user)) {
-        showToast('Usuário já existe!', 'error');
-        return;
-    }
+    if (!user || !pass) return showToast('Preencha tudo!', 'error');
 
-    const novoUsuario = { user, pass, role };
-    localStorage.setItem('pv_user_' + user, JSON.stringify(novoUsuario));
-    
-    showToast('Usuário registrado!', 'success');
+    localStorage.setItem('pv_user_' + user, JSON.stringify({ user, pass, role, entryTime: time }));
+    showToast('Cadastrado!', 'success');
     this.reset();
     carregarUsuarios();
 });
 
-function entrarNoSistema() {
-    document.getElementById('telaLogin').classList.add('hidden');
-    document.getElementById('app').classList.remove('hidden');
-    document.body.classList.remove('flex', 'items-center', 'justify-center'); // Ajuste para o dashboard fluir
-    document.getElementById('userStatus').innerText = `LOGADO COMO: ${currentUser.user.toUpperCase()} (${currentUser.role})`;
-    lucide.createIcons();
-}
-
-function logout() {
-    location.reload(); 
-}
-
 function carregarUsuarios() {
     const lista = document.getElementById('userList');
     lista.innerHTML = '';
-
     for (let i = 0; i < localStorage.length; i++) {
         const chave = localStorage.key(i);
         if (chave.startsWith('pv_user_')) {
-            const dados = JSON.parse(localStorage.getItem(chave));
-            
-            // Só Admin pode deletar usuários
-            const deleteBtn = (currentUser && currentUser.role === 'admin') 
-                ? `<button class="text-red-500 font-bold hover:underline" onclick="remover('${chave}')">Excluir</button>` 
-                : `<span class="text-slate-300">Bloqueado</span>`;
-
-            const linha = `
-                <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                    <td class="p-3 font-semibold">${dados.user}</td>
-                    <td class="p-3"><span class="px-2 py-1 rounded-md text-[10px] font-bold ${dados.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${dados.role.toUpperCase()}</span></td>
-                    <td class="p-3">${deleteBtn}</td>
-                </tr>
-            `;
-            lista.innerHTML += linha;
+            const d = JSON.parse(localStorage.getItem(chave));
+            lista.innerHTML += `
+                <tr class="border-b border-slate-50">
+                    <td class="p-3 font-bold">${d.user} <span class="block text-[9px] text-slate-400">${d.role}</span></td>
+                    <td class="p-3 text-xs">${d.entryTime}h</td>
+                    <td class="p-3"><button onclick="remover('${chave}')" class="text-red-500 hover:underline">Remover</button></td>
+                </tr>`;
         }
     }
 }
 
 function remover(chave) {
-    if (confirm('Deseja realmente remover este acesso?')) {
+    if(confirm('Excluir usuário?')) {
         localStorage.removeItem(chave);
-        showToast('Usuário removido');
         carregarUsuarios();
     }
 }
 
-// GERAÇÃO DE PDF
+// LOGICA DE PONTO E ATRASO
+function baterPonto() {
+    const agora = new Date();
+    const [hL, mL] = currentUser.entryTime.split(':');
+    const limite = new Date();
+    limite.setHours(parseInt(hL), parseInt(mL), 0);
+
+    let status = "No Horário";
+    if (agora > limite) {
+        const diff = Math.floor((agora - limite) / 1000 / 60);
+        status = `Atraso: ${diff} min`;
+        showToast(status, 'error');
+    } else {
+        showToast('Ponto batido com sucesso!', 'success');
+    }
+
+    const log = { user: currentUser.user, data: agora.toLocaleString('pt-br'), status: status };
+    const hist = JSON.parse(localStorage.getItem('pv_historico') || '[]');
+    hist.unshift(log);
+    localStorage.setItem('pv_historico', JSON.stringify(hist));
+}
+
+function carregarHistorico() {
+    const lista = document.getElementById('historyList');
+    const hist = JSON.parse(localStorage.getItem('pv_historico') || '[]');
+    lista.innerHTML = hist.map(l => `
+        <tr class="border-b border-slate-50">
+            <td class="p-3 font-bold">${l.user}</td>
+            <td class="p-3 text-slate-500">${l.data}</td>
+            <td class="p-3 font-bold ${l.status.includes('Atraso') ? 'text-red-500' : 'text-green-600'}">${l.status}</td>
+        </tr>`).join('');
+}
+
+function logout() { location.reload(); }
+
 function gerarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
-    doc.setFontSize(18);
-    doc.text("RELATÓRIO DE USUÁRIOS - PV-2026", 14, 20);
-    
-    const rows = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const chave = localStorage.key(i);
-        if (chave.startsWith('pv_user_')) {
-            const d = JSON.parse(localStorage.getItem(chave));
-            rows.push([d.user, d.role]);
-        }
-    }
-
+    const hist = JSON.parse(localStorage.getItem('pv_historico') || '[]');
+    doc.text("Relatorio de Presenca PV-2026", 14, 20);
     doc.autoTable({
         startY: 30,
-        head: [['Nome de Usuário', 'Nível de Acesso']],
-        body: rows,
+        head: [['Usuario', 'Data/Hora', 'Status']],
+        body: hist.map(l => [l.user, l.data, l.status]),
     });
-
-    doc.save('usuarios_pv2026.pdf');
-    showToast('PDF Gerado com sucesso!', 'success');
+    doc.save('relatorio.pdf');
 }
