@@ -1,19 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-body { font-family: 'Inter', sans-serif; }
-
-.active-tab {
-    background-color: white;
-    color: #0f172a;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.02em;
 }
 
-.tab-btn:not(.active-tab) { color: #94a3b8; }
-
-input:focus { border-color: #0f172a !important; }
-
-@keyframes bounce-short {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+.nav-btn:not(.active) {
+    color: #94a3b8;
 }
-.animate-bounce-short { animation: bounce-short 0.3s ease-in-out; }
+
+.checkbox-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.checkbox-card:hover {
+    border-color: #6366f1;
+    background: #f8faff;
+}
+
+.checkbox-card input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #6366f1;
+}
+
+/* Scrollbar Customizada */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
