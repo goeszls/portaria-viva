@@ -85,11 +85,27 @@
                             <input type="text" id="alunoNome" placeholder="NOME COMPLETO" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-xs font-bold uppercase outline-none focus:border-indigo-500">
                             
                             <div class="grid grid-cols-2 gap-3">
-                                <select id="alunoSerie" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none">
-                                    <option value="1 TEC">1º TÉCNICO</option><option value="2 TEC">2º TÉCNICO</option><option value="3 TEC">3º TÉCNICO</option>
-                                    <option value="1 ANO">1º ANO MÉDIO</option><option value="2 ANO">2º ANO MÉDIO</option><option value="3 ANO">3º ANO MÉDIO</option>
-                                    <option value="9 FUND">9º FUNDAMENTAL</option>
-                                </select>
+                                <select id="alunoSerie" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none focus:border-indigo-500 transition-all">
+    <optgroup label="Ensino Fundamental" class="bg-slate-900 text-indigo-400">
+        <option value="6 ANO">6º ANO FUNDAMENTAL</option>
+        <option value="7 ANO">7º ANO FUNDAMENTAL</option>
+        <option value="8 ANO">8º ANO FUNDAMENTAL</option>
+        <option value="9 ANO">9º ANO FUNDAMENTAL</option>
+    </optgroup>
+    
+    <optgroup label="Ensino Médio" class="bg-slate-900 text-indigo-400">
+        <option value="1 ANO">1º ANO MÉDIO</option>
+        <option value="2 ANO">2º ANO MÉDIO</option>
+        <option value="3 ANO">3º ANO MÉDIO</option>
+    </optgroup>
+
+    <optgroup label="Ensino Técnico" class="bg-slate-900 text-indigo-400">
+        <option value="1 TEC">1º TÉCNICO</option>
+        <option value="2 TEC">2º TÉCNICO</option>
+        <option value="3 TEC">3º TÉCNICO</option>
+    </optgroup>
+</select>
+
                                 <select id="alunoTurma" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none">
                                     <option value="A">TURMA A</option><option value="B">TURMA B</option><option value="C">TURMA C</option>
                                     <option value="D">TURMA D</option><option value="E">TURMA E</option><option value="F">TURMA F</option>
