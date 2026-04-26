@@ -30,27 +30,25 @@
             <form id="loginForm" class="space-y-4">
                 <input type="text" id="loginUser" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 ring-indigo-500">
                 <input type="password" id="loginPass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 ring-indigo-500">
-                <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">Acessar Sistema</button>
+                <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">Acessar</button>
             </form>
 
             <form id="registerForm" class="space-y-4 hidden">
-                <input type="text" id="regUser" placeholder="Definir Usuário" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
-                <input type="password" id="regPass" placeholder="Definir Senha" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
-                <button type="submit" class="w-full py-4 rounded-2xl bg-slate-800 text-white font-black uppercase tracking-widest hover:bg-black transition-all">Criar Conta de Gestão</button>
+                <input type="text" id="regUser" placeholder="Novo Usuário" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
+                <input type="password" id="regPass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
+                <button type="submit" class="w-full py-4 rounded-2xl bg-slate-800 text-white font-black uppercase tracking-widest hover:bg-black transition-all">Criar Conta</button>
             </form>
         </div>
     </div>
 
     <div id="mainDashboard" class="hidden min-h-screen p-4 md:p-8">
         <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div class="flex items-center gap-4 bg-white p-2 rounded-3xl shadow-sm pr-6">
-                <nav class="flex gap-2">
-                    <button onclick="navTo('aba-alunos')" class="nav-btn active px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Alunos</button>
-                    <button onclick="navTo('aba-atrasos')" class="nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Atrasos</button>
-                    <button onclick="navTo('aba-historico')" class="nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Histórico</button>
-                    <button id="navAdmin" onclick="navTo('aba-admin')" class="hidden nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase bg-red-50 text-red-600">Admin</button>
-                </nav>
-            </div>
+            <nav class="flex gap-2 bg-white p-2 rounded-3xl shadow-sm">
+                <button onclick="navTo('aba-alunos')" class="nav-btn active px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Alunos</button>
+                <button onclick="navTo('aba-atrasos')" class="nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Registrar Atraso</button>
+                <button onclick="navTo('aba-historico')" class="nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase transition-all">Histórico</button>
+                <button id="navAdmin" onclick="navTo('aba-admin')" class="hidden nav-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase bg-red-50 text-red-600">Admin</button>
+            </nav>
             <button onclick="logout()" class="p-4 rounded-2xl bg-white text-red-500 shadow-sm hover:bg-red-50 transition-all"><i data-lucide="log-out"></i></button>
         </header>
 
@@ -59,65 +57,77 @@
             <section id="aba-alunos" class="tab-content">
                 <div class="grid md:grid-cols-3 gap-8">
                     <div class="md:col-span-1 space-y-6">
-                        <h2 class="text-xl font-black uppercase tracking-tighter italic">Matrícula de Aluno</h2>
+                        <h2 class="text-xl font-black uppercase tracking-tighter italic">Matrícula</h2>
                         <form id="formAluno" class="space-y-3">
-                            <input type="text" id="alunoNome" placeholder="Nome Completo" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" id="alunoSerie" placeholder="Série (ex: 9º)" class="p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none">
-                                <input type="text" id="alunoTurma" placeholder="Turma (ex: A)" class="p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none">
-                            </div>
-                            <select id="alunoPeriodo" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none font-bold text-slate-500">
-                                <option value="Manhã">Período: Manhã</option>
-                                <option value="Tarde">Período: Tarde</option>
+                            <input type="text" id="alunoNome" placeholder="Nome do Aluno" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none" required>
+                            
+                            <select id="alunoSerie" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none font-bold text-xs" required>
+                                <option value="" disabled selected>SELECIONE A SÉRIE</option>
+                                <optgroup label="TÉCNICO">
+                                    <option value="1 TEC">1 TEC</option><option value="2 TEC">2 TEC</option><option value="3 TEC">3 TEC</option>
+                                </optgroup>
+                                <optgroup label="ENSINO MÉDIO">
+                                    <option value="1 ANO">1 ANO</option><option value="2 ANO">2 ANO</option><option value="3 ANO">3 ANO</option>
+                                </optgroup>
+                                <optgroup label="ENSINO FUNDAMENTAL">
+                                    <option value="6 ANO">6 ANO</option><option value="7 ANO">7 ANO</option><option value="8 ANO">8 ANO</option><option value="9 ANO">9 ANO</option>
+                                </optgroup>
                             </select>
+
+                            <select id="alunoTurma" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none font-bold text-xs" required>
+                                <option value="" disabled selected>SELECIONE A TURMA</option>
+                                <option value="SISTEMAS">SISTEMAS</option><option value="AUTOMAÇÃO">AUTOMAÇÃO</option>
+                                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+                            </select>
+
+                            <select id="alunoPeriodo" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none font-bold text-xs" required>
+                                <option value="Manhã">MANHÃ</option><option value="Tarde">TARDE</option>
+                            </select>
+
                             <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase text-xs">Confirmar Matrícula</button>
                         </form>
                     </div>
-                    <div class="md:col-span-2">
-                        <h2 class="text-xl font-black uppercase tracking-tighter mb-6 italic">Corpo Discente</h2>
-                        <div class="overflow-hidden rounded-3xl border border-slate-100">
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400">
-                                    <tr><th class="p-4">Aluno</th><th class="p-4">Série/Turma</th><th class="p-4">Período</th><th class="p-4 text-right">Ação</th></tr>
-                                </thead>
-                                <tbody id="listaAlunos" class="text-sm font-medium"></tbody>
-                            </table>
-                        </div>
+                    <div class="md:col-span-2 overflow-hidden rounded-3xl border border-slate-100">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400">
+                                <tr><th class="p-4">Aluno</th><th class="p-4">Série/Turma</th><th class="p-4">Período</th><th class="p-4 text-right">Ação</th></tr>
+                            </thead>
+                            <tbody id="listaAlunos" class="text-sm"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
             <section id="aba-atrasos" class="tab-content hidden">
-                <div class="grid md:grid-cols-2 gap-12">
-                    <div class="space-y-8">
-                        <div class="flex justify-between items-end border-b pb-4">
-                            <div>
-                                <p id="dataAtual" class="text-xs font-black text-indigo-500 uppercase"></p>
-                                <h2 id="horaAtual" class="text-5xl font-black text-slate-800 tabular-nums">00:00:00</h2>
-                            </div>
+                <div id="lockAtraso" class="text-center py-20 hidden">
+                    <i data-lucide="lock" class="w-12 h-12 mx-auto text-slate-300 mb-4"></i>
+                    <p class="text-slate-400 font-bold uppercase text-xs">Acesso Restrito ao Administrador</p>
+                </div>
+                <div id="contentAtraso" class="grid md:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="border-b pb-4">
+                            <p id="dataAtual" class="text-xs font-black text-indigo-500 uppercase"></p>
+                            <h2 id="horaAtual" class="text-5xl font-black text-slate-800 tabular-nums">00:00:00</h2>
                         </div>
-                        <div class="space-y-4">
-                            <label class="text-xs font-black uppercase text-slate-400">Pesquisar Aluno p/ Atraso</label>
-                            <div class="relative">
-                                <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="Digite o nome..." class="w-full p-5 rounded-3xl bg-slate-100 border-none outline-none focus:ring-2 ring-indigo-500">
-                                <div id="resultadoBusca" class="absolute top-full left-0 right-0 bg-white shadow-2xl rounded-3xl mt-2 z-50 overflow-hidden hidden"></div>
-                            </div>
+                        <div class="relative">
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Pesquisar para Registro</label>
+                            <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="Nome do aluno..." class="w-full p-5 rounded-3xl bg-slate-100 border-none outline-none focus:ring-2 ring-indigo-500">
+                            <div id="resultadoBusca" class="absolute top-full left-0 right-0 bg-white shadow-2xl rounded-3xl mt-2 z-50 overflow-hidden hidden border border-slate-100"></div>
                         </div>
                     </div>
-
-                    <div id="formAtrasoContainer" class="hidden animate-in fade-in slide-in-from-bottom-4">
+                    <div id="formAtrasoContainer" class="hidden">
                         <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-200">
                             <h3 id="nomeAlunoSelecionado" class="text-lg font-black uppercase mb-6 text-indigo-600"></h3>
                             <div class="space-y-4">
-                                <p class="text-[10px] font-black uppercase text-slate-400">Motivo do Atraso:</p>
                                 <div class="grid grid-cols-1 gap-2">
                                     <label class="checkbox-card"><input type="radio" name="motivo" value="Circular"> <span>Atraso de Circular</span></label>
                                     <label class="checkbox-card"><input type="radio" name="motivo" value="Médico"> <span>Consulta Médica</span></label>
                                     <label class="checkbox-card"><input type="radio" name="motivo" value="Pessoal"> <span>Assuntos Pessoais</span></label>
-                                    <label class="checkbox-card"><input type="radio" name="motivo" value="Outros" id="checkOutros"> <span>Outros (Justificar)</span></label>
+                                    <label class="checkbox-card"><input type="radio" name="motivo" value="Outros"> <span>Outros (Justificar)</span></label>
                                 </div>
-                                <textarea id="justificativa" placeholder="Escreva a justificativa aqui..." class="w-full p-4 rounded-2xl border-none bg-white shadow-inner hidden h-24 outline-none"></textarea>
-                                <button onclick="salvarAtraso()" class="w-full py-5 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-tighter">Validar Entrada</button>
+                                <textarea id="justificativa" placeholder="Justificativa livre..." class="w-full p-4 rounded-2xl border-none bg-white shadow-inner hidden h-24 outline-none"></textarea>
+                                <button onclick="salvarAtraso()" class="w-full py-5 rounded-2xl bg-slate-900 text-white font-black uppercase">Validar Atraso</button>
                             </div>
                         </div>
                     </div>
@@ -126,36 +136,28 @@
 
             <section id="aba-historico" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-black uppercase italic">Livro de Ocorrências</h2>
-                    <button onclick="exportarPDF()" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-green-600 text-white font-bold text-xs hover:bg-green-700">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> GERAR PLANILHA PDF
-                    </button>
+                    <h2 class="text-2xl font-black uppercase italic">Histórico de Entradas</h2>
+                    <button onclick="exportarPDF()" class="px-6 py-3 rounded-2xl bg-green-600 text-white font-bold text-xs uppercase">Gerar PDF</button>
                 </div>
                 <div class="overflow-x-auto rounded-[2rem] border border-slate-100">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-900 text-white text-[10px] uppercase">
-                            <tr><th class="p-4">Data</th><th class="p-4">Hora</th><th class="p-4">Aluno</th><th class="p-4">Série</th><th class="p-4">Motivo</th><th class="p-4">Justificativa</th></tr>
+                            <tr><th class="p-4">Data</th><th class="p-4">Hora</th><th class="p-4">Aluno</th><th class="p-4">Min. Atraso</th><th class="p-4">Motivo</th></tr>
                         </thead>
-                        <tbody id="tabelaHistorico" class="text-sm font-medium"></tbody>
+                        <tbody id="tabelaHistorico" class="text-sm"></tbody>
                     </table>
                 </div>
             </section>
 
             <section id="aba-admin" class="tab-content hidden">
-                <h2 class="text-2xl font-black uppercase text-red-600 mb-8 tracking-tighter">Gestão de Acessos Administrativos</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-red-50 p-8 rounded-[2.5rem] border border-red-100">
-                        <p class="text-xs font-bold text-red-500 mb-4 uppercase">Atenção</p>
-                        <p class="text-sm text-red-800 leading-relaxed font-medium">Você está visualizando todos os funcionários com acesso ao sistema. A exclusão de um usuário impedirá o acesso dele imediatamente.</p>
-                    </div>
-                    <div class="overflow-hidden rounded-[2rem] border border-slate-100">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 text-[10px] uppercase text-slate-400">
-                                <tr><th class="p-4">Usuário Gestor</th><th class="p-4 text-right">Ação</th></tr>
-                            </thead>
-                            <tbody id="listaGestores"></tbody>
-                        </table>
-                    </div>
+                <h2 class="text-2xl font-black uppercase text-red-600 mb-8 tracking-tighter italic">Gestão de Gestores</h2>
+                <div class="overflow-hidden rounded-[2rem] border border-slate-100 max-w-2xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-[10px] uppercase text-slate-400">
+                            <tr><th class="p-4">Usuário</th><th class="p-4 text-right">Ação</th></tr>
+                        </thead>
+                        <tbody id="listaGestores"></tbody>
+                    </table>
                 </div>
             </section>
         </main>
