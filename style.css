@@ -1,17 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
 
-body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; }
-
-.nav-btn:not(.active) { color: #94a3b8; }
-
-.checkbox-card {
-    display: flex; align-items: center; gap: 12px; padding: 15px;
-    background: white; border: 1px solid #e2e8f0; border-radius: 16px;
-    cursor: pointer; font-size: 11px; font-weight: 800; text-transform: uppercase;
+:root {
+    --bg-dark: #0f172a;
+    --indigo: #6366f1;
 }
 
-.checkbox-card:hover { border-color: #6366f1; background: #f8faff; }
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.03em;
+}
 
-input[type="radio"] { width: 18px; height: 18px; accent-color: #6366f1; }
+/* PERSPECTIVE CLASSES */
+.perspective-container { perspective: 2000px; }
+.perspective-1000 { perspective: 1000px; }
 
-optgroup { font-style: normal; font-weight: 900; color: #6366f1; background: #f8fafc; }
+/* 3D ANIMATIONS */
+@keyframes entry3D {
+    from {
+        opacity: 0;
+        transform: translateZ(-200px) rotateX(15deg) translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateZ(0) rotateX(0) translateY(0);
+    }
+}
+
+@keyframes top3D {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) rotateX(-20deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+    }
+}
+
+@keyframes toastEntry {
+    from {
+        opacity: 0;
+        transform: translateX(100px) scale(0.8) rotateY(-20deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1) rotateY(0);
+    }
+}
+
+.animate-3d-entry { animation: entry3D 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-3d-top { animation: top3D 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-toast-entry { animation: toastEntry 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-toast-exit { animation: toastEntry 0.5s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards; }
+
+/* NAV STYLES */
+.nav-btn:not(.active) { color: #64748b; }
+.nav-btn.active {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* INPUTS E RADIO */
+.radio-premium {
+    display: flex; align-items: center; gap: 15px; padding: 20px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px; cursor: pointer; font-size: 10px; font-weight: 800;
+    text-transform: uppercase; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.radio-premium:hover {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateZ(20px);
+}
+
+.radio-premium input[type="radio"] {
+    width: 20px; height: 20px; accent-color: #6366f1;
+}
+
+select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 1rem;
+}
+
+/* GLASS EFFECT SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.5); }
