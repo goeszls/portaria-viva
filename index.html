@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PV-2026 PRO | Manual SaaS Edition</title>
+    <title>PV-2026 PRO | SaaS Enterprise</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen font-sans">
@@ -20,11 +22,11 @@
                     <i data-lucide="shield-check" class="w-10 h-10 text-white"></i>
                 </div>
                 <h1 class="text-3xl font-black text-white italic">PV-2026 <span class="text-indigo-500">PRO</span></h1>
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em] mt-2">Acesso Restrito à Instituição</p>
+                <p class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em] mt-2">Enterprise Control System</p>
             </div>
             <form id="loginForm" class="space-y-4">
-                <input type="text" id="loginUser" placeholder="USUÁRIO" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold">
-                <input type="password" id="loginPass" placeholder="SENHA" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold">
+                <input type="text" id="loginUser" placeholder="USUÁRIO" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold transition-all">
+                <input type="password" id="loginPass" placeholder="SENHA" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold transition-all">
                 <button type="submit" class="w-full py-5 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all">Entrar no Sistema</button>
             </form>
         </div>
@@ -41,7 +43,7 @@
             <div class="flex items-center gap-4 bg-white/5 p-3 rounded-3xl border border-white/10">
                 <div class="text-right pr-4 border-r border-white/10">
                     <p id="userStatus" class="text-[10px] font-black text-indigo-400 uppercase"></p>
-                    <p class="text-[8px] text-green-500 font-bold uppercase tracking-tighter">● Online</p>
+                    <p class="text-[8px] text-green-500 font-bold uppercase tracking-tighter">● Cloud Active</p>
                 </div>
                 <button onclick="logout()" class="p-4 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><i data-lucide="power"></i></button>
             </div>
@@ -50,19 +52,25 @@
         <main class="max-w-[1600px] mx-auto">
             
             <section id="aba-dash" class="tab-content animate-3d-entry">
-                <div class="grid lg:grid-cols-4 gap-6">
-                    <div class="bg-indigo-600 p-8 rounded-[3rem] shadow-2xl">
+                <div class="grid lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-indigo-600 p-8 rounded-[3rem] shadow-2xl relative overflow-hidden group">
                         <p class="text-[10px] font-black text-indigo-200 uppercase mb-2">Alunos Ativos</p>
                         <h2 id="statTotalAlunos" class="text-5xl font-black text-white italic">0</h2>
+                        <i data-lucide="users" class="absolute -right-4 -bottom-4 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform"></i>
                     </div>
-                    <div class="lg:col-span-3 bg-white/5 border border-white/10 rounded-[3.5rem] p-8 flex flex-col md:flex-row gap-8">
-                        <div class="w-full md:w-1/2">
-                            <h3 class="text-xs font-black uppercase mb-6 text-slate-500 italic">Estatística de Atrasos</h3>
-                            <canvas id="chartAtrasos" height="150"></canvas>
+                    <div class="lg:col-span-3 bg-white/5 border border-white/10 rounded-[3.5rem] p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xs font-black uppercase text-slate-500 italic">Relatório Geral de Atrasos</h3>
+                            <button onclick="exportarPDF()" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase transition-all">
+                                <i data-lucide="download" class="w-4 h-4"></i> Exportar PDF do Dia
+                            </button>
                         </div>
-                        <div class="w-full md:w-1/2">
-                            <h3 class="text-xs font-black uppercase mb-6 text-slate-500 italic">Alertas de Recidiva</h3>
-                            <div id="riscoContainer" class="space-y-3"></div>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <canvas id="chartAtrasos" height="150"></canvas>
+                            <div class="space-y-3">
+                                <p class="text-[9px] font-black text-red-500 uppercase tracking-widest mb-4">Alunos com Limite Excedido (>3)</p>
+                                <div id="riscoContainer" class="space-y-3 overflow-y-auto max-h-[200px] pr-2"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,32 +79,32 @@
             <section id="aba-alunos" class="tab-content hidden animate-3d-entry">
                 <div class="grid lg:grid-cols-12 gap-8">
                     <div class="lg:col-span-4 bg-white/5 border border-white/10 p-10 rounded-[3.5rem]">
-                        <h2 class="text-xl font-black uppercase italic mb-8">Cadastro de Aluno</h2>
+                        <h2 class="text-xl font-black uppercase italic mb-8">Novo Estudante</h2>
                         <form id="formAluno" class="space-y-4">
-                            <input type="text" id="alunoNome" placeholder="NOME COMPLETO" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-xs font-bold uppercase outline-none focus:border-indigo-500">
+                            <input type="text" id="alunoNome" placeholder="NOME COMPLETO" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-xs font-bold uppercase outline-none focus:border-indigo-500 transition-all">
                             
-                            <select id="alunoSerie" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase">
-                                <option value="1 TEC">1º TÉCNICO</option><option value="2 TEC">2º TÉCNICO</option><option value="3 TEC">3º TÉCNICO</option>
-                                <option value="1 ANO">1º ANO MÉDIO</option><option value="2 ANO">2º ANO MÉDIO</option><option value="3 ANO">3º ANO MÉDIO</option>
-                                <option value="6 ANO">6º ANO</option><option value="7 ANO">7º ANO</option><option value="8 ANO">8º ANO</option><option value="9 ANO">9º ANO</option>
-                            </select>
+                            <div class="grid grid-cols-2 gap-3">
+                                <select id="alunoSerie" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none focus:border-indigo-500">
+                                    <option value="1 TEC">1º TÉCNICO</option><option value="2 TEC">2º TÉCNICO</option><option value="3 TEC">3º TÉCNICO</option>
+                                    <option value="1 ANO">1º ANO MÉDIO</option><option value="2 ANO">2º ANO MÉDIO</option><option value="3 ANO">3º ANO MÉDIO</option>
+                                </select>
+                                <select id="alunoTurma" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none focus:border-indigo-500">
+                                    <option value="SISTEMAS">SISTEMAS</option><option value="AUTOMAÇÃO">AUTOMAÇÃO</option>
+                                    <option value="A">TURMA A</option><option value="B">TURMA B</option>
+                                </select>
+                            </div>
 
-                            <select id="alunoTurma" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase">
-                                <option value="SISTEMAS">SISTEMAS</option><option value="AUTOMAÇÃO">AUTOMAÇÃO</option>
-                                <option value="A">TURMA A</option><option value="B">TURMA B</option><option value="C">TURMA C</option>
-                            </select>
-
-                            <select id="alunoPeriodo" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase">
+                            <select id="alunoPeriodo" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none focus:border-indigo-500">
                                 <option value="Manhã">MANHÃ (07:05)</option><option value="Tarde">TARDE (13:05)</option>
                             </select>
 
-                            <button type="submit" class="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black uppercase text-[10px] tracking-widest shadow-xl">Finalizar Matrícula</button>
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-500/20 hover:scale-[1.02] transition-all">Confirmar Matrícula</button>
                         </form>
                     </div>
                     <div class="lg:col-span-8 bg-black/20 border border-white/10 rounded-[3.5rem] overflow-hidden">
                         <table class="w-full text-left">
                             <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
-                                <tr><th class="p-6">Nome</th><th class="p-6">Série/Turma</th><th class="p-6">Turno</th><th class="p-6 text-right">Ação</th></tr>
+                                <tr><th class="p-6">Estudante</th><th class="p-6">Turma</th><th class="p-6">Turno</th><th class="p-6 text-right">Ação</th></tr>
                             </thead>
                             <tbody id="listaAlunos" class="text-sm font-bold text-slate-300"></tbody>
                         </table>
@@ -107,27 +115,28 @@
             <section id="aba-atrasos" class="tab-content hidden animate-3d-entry">
                 <div class="grid lg:grid-cols-2 gap-12">
                     <div class="space-y-6">
-                        <div class="p-10 rounded-[3.5rem] bg-indigo-600/10 border border-indigo-500/20 text-center">
-                            <p id="horaAtual" class="text-7xl font-black text-white italic tracking-tighter">00:00:00</p>
-                            <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-2">Controle de Fluxo Manual</p>
+                        <div class="p-10 rounded-[3.5rem] bg-white/5 border border-white/10 text-center relative overflow-hidden">
+                            <p id="horaAtual" class="text-7xl font-black text-white italic tracking-tighter tabular-nums">00:00:00</p>
+                            <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-2">Relógio de Entrada Oficial</p>
                         </div>
                         <div class="relative">
-                            <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="PESQUISAR NOME DO ALUNO..." class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 outline-none text-lg font-bold uppercase tracking-tighter focus:border-indigo-500">
+                            <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="DIGITE O NOME PARA REGISTRAR ATRASO..." class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 outline-none text-lg font-bold uppercase tracking-tighter focus:border-indigo-500 transition-all">
                             <div id="resultadoBusca" class="absolute z-50 w-full mt-2 bg-[#0f172a] rounded-3xl overflow-hidden hidden border border-white/10 shadow-2xl"></div>
                         </div>
                     </div>
                     <div id="formAtrasoContainer" class="hidden">
-                        <div class="bg-white/5 p-12 rounded-[4rem] border border-white/10 shadow-2xl">
+                        <div class="bg-white/5 p-12 rounded-[4rem] border border-white/10 shadow-2xl relative">
+                            <div id="statusAlerta" class="hidden absolute top-8 right-8 px-4 py-2 bg-red-600 text-white text-[8px] font-black uppercase rounded-full animate-pulse">Atraso Recorrente!</div>
                             <h3 id="nomeAlunoSelecionado" class="text-3xl font-black uppercase text-white mb-2 italic tracking-tighter"></h3>
                             <p id="infoAlunoSelecionado" class="text-[10px] text-indigo-400 font-black uppercase mb-8"></p>
                             <div class="grid gap-3 mb-8">
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Circular"><span>Atraso Circular</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Circular"><span>Transporte / Circular</span></label>
                                 <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal"><span>Motivos Pessoais</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Médico"><span>Médico/Atestado</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Médico"><span>Médico / Atestado</span></label>
                                 <label class="radio-ent"><input type="radio" name="motivo" value="Outros"><span>Outros</span></label>
                             </div>
-                            <textarea id="justificativa" placeholder="Descreva o motivo..." class="w-full p-6 rounded-3xl bg-black/40 border border-white/10 text-white text-xs hidden h-24 outline-none mb-6"></textarea>
-                            <button onclick="salvarAtraso()" class="w-full py-6 rounded-3xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all">Registrar Entrada</button>
+                            <textarea id="justificativa" placeholder="Observações adicionais..." class="w-full p-6 rounded-3xl bg-black/40 border border-white/10 text-white text-xs hidden h-24 outline-none mb-6"></textarea>
+                            <button onclick="salvarAtraso()" class="w-full py-6 rounded-3xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50 transition-all">Validar Atraso</button>
                         </div>
                     </div>
                 </div>
@@ -136,28 +145,33 @@
             <section id="aba-admin" class="tab-content hidden animate-3d-entry">
                 <div class="grid lg:grid-cols-2 gap-10">
                     <div class="bg-white/5 border border-white/10 p-10 rounded-[3.5rem]">
-                        <h2 class="text-xl font-black uppercase text-red-500 mb-8 italic">Criar Gestor Staff</h2>
+                        <h2 class="text-xl font-black uppercase text-red-500 mb-8 italic">Gestão de Operadores</h2>
                         <form id="formNovoGestor" class="space-y-4 mb-10">
-                            <input type="text" id="newUserName" placeholder="NOME DO OPERADOR" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 outline-none font-bold text-xs">
-                            <input type="password" id="newUserPass" placeholder="SENHA" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 outline-none font-bold text-xs">
-                            <button type="submit" class="w-full py-5 rounded-2xl bg-red-600 text-white font-black uppercase text-[10px] tracking-widest">Ativar Credencial</button>
+                            <input type="text" id="newUserName" placeholder="IDENTIFICAÇÃO STAFF" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 outline-none font-bold text-xs">
+                            <input type="password" id="newUserPass" placeholder="SENHA DE ACESSO" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 outline-none font-bold text-xs">
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-red-600 text-white font-black uppercase text-[10px] tracking-widest">Ativar Novo Usuário</button>
                         </form>
                         <div class="rounded-3xl border border-white/5 overflow-hidden">
                             <table class="w-full text-left">
                                 <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
-                                    <tr><th class="p-6">Usuário</th><th class="p-6 text-right">Controle</th></tr>
+                                    <tr><th class="p-6">Operador</th><th class="p-6 text-right">Controle Master</th></tr>
                                 </thead>
                                 <tbody id="listaGestores"></tbody>
                             </table>
                         </div>
                     </div>
                     <div class="bg-indigo-600/10 border border-indigo-500/20 p-10 rounded-[3.5rem]">
-                        <h2 class="text-xl font-black uppercase text-indigo-400 mb-8 italic">Status da Licença</h2>
-                        <div class="p-6 rounded-3xl bg-black/20 flex justify-between items-center mb-4">
-                            <div><p class="text-[10px] font-black text-slate-500 uppercase">Assinatura Mensal</p><p class="text-white font-black">PLATINUM PLAN</p></div>
-                            <span class="px-4 py-1 rounded-full bg-green-500/20 text-green-500 text-[9px] font-black uppercase">Ativo</span>
+                        <h2 class="text-xl font-black uppercase text-indigo-400 mb-4 italic">Painel de Controle SaaS</h2>
+                        <div class="space-y-4">
+                            <div class="p-6 rounded-3xl bg-black/20 border border-white/5">
+                                <p class="text-[9px] font-black text-slate-500 uppercase">Acesso Teste (Admin Master)</p>
+                                <p class="text-[11px] text-white font-medium mt-1 italic">● Você possui permissão para registrar atrasos em qualquer aba de teste.</p>
+                            </div>
+                            <div class="p-6 rounded-3xl bg-black/20 border border-white/5">
+                                <p class="text-[9px] font-black text-slate-500 uppercase">Segurança de Dados</p>
+                                <p class="text-[11px] text-white font-medium mt-1">● Apenas sua conta master pode excluir registros de alunos ou operadores.</p>
+                            </div>
                         </div>
-                        <p class="text-[9px] text-slate-500 font-bold leading-relaxed px-2">Este painel é exclusivo do Administrador Master para controle de cobrança e novos acessos.</p>
                     </div>
                 </div>
             </section>
