@@ -9,42 +9,51 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .nav-btn.active { background: white; color: black; }
+        .tab-content.hidden { display: none; }
+        .animate-3d-entry { animation: entry 0.5s ease-out; }
+        @keyframes entry { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .radio-ent { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; transition: 0.3s; }
+        .radio-ent:hover { background: rgba(255,255,255,0.1); }
+        .radio-ent input { accent-color: #4f46e5; }
+    </style>
 </head>
-<body class="bg-[#020617] text-slate-200 min-h-screen font-sans">
+<body class="bg-[#020617] text-slate-200 min-h-screen">
 
     <div id="authSection" class="min-h-screen flex items-center justify-center p-6">
-        <div class="bg-white/5 backdrop-blur-2xl border border-white/10 w-full max-w-md rounded-[3rem] p-10 shadow-2xl animate-3d-entry text-center">
+        <div class="bg-white/5 backdrop-blur-2xl border border-white/10 w-full max-w-md rounded-[3rem] p-10 shadow-2xl text-center">
             <div class="mb-10">
-                <div class="inline-flex p-6 rounded-3xl bg-indigo-600 shadow-indigo-500/20 mb-6">
+                <div class="inline-flex p-6 rounded-3xl bg-indigo-600 mb-6">
                     <i data-lucide="shield-check" class="w-10 h-10 text-white"></i>
                 </div>
                 <h1 class="text-3xl font-black text-white italic uppercase">PV-2026 <span class="text-indigo-500">PRO</span></h1>
                 <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2 italic">Controle Escolar</p>
             </div>
-            <form id="loginForm" class="space-y-4">
+            <div class="space-y-4">
                 <input type="text" id="loginUser" placeholder="USUÁRIO" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold transition-all">
                 <input type="password" id="loginPass" placeholder="SENHA" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold transition-all">
-                <button type="submit" class="w-full py-5 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all">Acessar Painel</button>
-            </form>
+                <button onclick="login()" class="w-full py-5 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all">Acessar Painel</button>
+            </div>
         </div>
     </div>
 
     <div id="mainDashboard" class="hidden p-6 md:p-10">
         <header class="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between items-center mb-10 gap-6">
             <nav class="flex gap-2 bg-black/40 backdrop-blur-xl p-2 rounded-[2.5rem] border border-white/10 shadow-2xl overflow-x-auto max-w-full">
-                <button onclick="navTo('aba-dash', event)" class="nav-btn active px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Dashboard</button>
-                <button onclick="navTo('aba-alunos', event)" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Matrícula</button>
-                <button onclick="navTo('aba-atrasos', event)" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Portaria</button>
-                <button onclick="navTo('aba-historico', event)" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Histórico</button>
-                <button id="navAdmin" onclick="navTo('aba-admin', event)" class="hidden nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase text-red-400 whitespace-nowrap">Master</button>
+                <button onclick="navTo('aba-dash')" class="nav-btn active px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Dashboard</button>
+                <button onclick="navTo('aba-alunos')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Matrícula</button>
+                <button onclick="navTo('aba-atrasos')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Portaria</button>
+                <button onclick="navTo('aba-historico')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Histórico</button>
             </nav>
             <div class="flex items-center gap-4 bg-white/5 p-3 rounded-3xl border border-white/10">
                 <div class="text-right pr-4 border-r border-white/10">
-                    <p id="userStatus" class="text-[10px] font-black text-indigo-400 uppercase"></p>
+                    <p id="userNameDisplay" class="text-[10px] font-black text-indigo-400 uppercase">ADMIN</p>
                     <p class="text-[8px] text-green-500 font-bold uppercase tracking-tighter">● Sistema Ativo</p>
                 </div>
-                <button onclick="logout()" class="p-4 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><i data-lucide="power"></i></button>
+                <button onclick="location.reload()" class="p-4 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><i data-lucide="power"></i></button>
             </div>
         </header>
 
@@ -52,25 +61,22 @@
             
             <section id="aba-dash" class="tab-content animate-3d-entry">
                 <div class="grid lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-indigo-600 p-8 rounded-[3rem] shadow-2xl relative overflow-hidden">
+                    <div class="bg-indigo-600 p-8 rounded-[3rem] shadow-2xl">
                         <p class="text-[10px] font-black text-indigo-200 uppercase mb-2">Total de Alunos</p>
                         <h2 id="statTotalAlunos" class="text-5xl font-black text-white italic">0</h2>
                     </div>
-                    <div class="bg-red-600 p-8 rounded-[3rem] shadow-2xl relative overflow-hidden">
+                    <div class="bg-red-600 p-8 rounded-[3rem] shadow-2xl">
                         <p class="text-[10px] font-black text-red-200 uppercase mb-2">Turma com mais Atrasos</p>
                         <h2 id="statTurmaProblema" class="text-2xl font-black text-white italic uppercase">---</h2>
                     </div>
                     <div class="lg:col-span-2 bg-white/5 border border-white/10 rounded-[3.5rem] p-8">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-[10px] font-black uppercase text-slate-500">Métricas de Frequência</h3>
-                            <button onclick="exportarPDF()" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase transition-all">
-                                <i data-lucide="download" class="w-4 h-4"></i> PDF
+                            <button onclick="exportarPDF('dashboard')" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase">
+                                <i data-lucide="download" class="w-4 h-4"></i> PDF Dashboard
                             </button>
                         </div>
-                        <div class="grid md:grid-cols-2 gap-8">
-                            <canvas id="chartAtrasos" height="150"></canvas>
-                            <div id="riscoContainer" class="space-y-2 overflow-y-auto max-h-[140px]"></div>
-                        </div>
+                        <p class="text-xs text-slate-400">Gráfico de desempenho em tempo real disponível no relatório PDF completo.</p>
                     </div>
                 </div>
             </section>
@@ -81,38 +87,22 @@
                         <h2 class="text-xl font-black uppercase italic mb-8">Novo Cadastro</h2>
                         <form id="formAluno" class="space-y-4">
                             <input type="text" id="alunoNome" placeholder="NOME COMPLETO" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-xs font-bold uppercase outline-none focus:border-indigo-500">
-                            
                             <div class="grid grid-cols-2 gap-3">
                                 <select id="alunoSerie" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none">
-                                    <optgroup label="Ensino Fundamental" class="bg-slate-900">
-                                        <option value="6 ANO">6º ANO</option><option value="7 ANO">7º ANO</option>
-                                        <option value="8 ANO">8º ANO</option><option value="9 ANO">9º ANO</option>
-                                    </optgroup>
-                                    <optgroup label="Ensino Médio" class="bg-slate-900">
-                                        <option value="1 ANO">1º ANO</option><option value="2 ANO">2º ANO</option><option value="3 ANO">3º ANO</option>
-                                    </optgroup>
-                                    <optgroup label="Técnico" class="bg-slate-900">
-                                        <option value="1 TEC">1º TEC</option><option value="2 TEC">2º TEC</option><option value="3 TEC">3º TEC</option>
-                                    </optgroup>
+                                    <option value="1 ANO">1º ANO</option><option value="2 ANO">2º ANO</option><option value="3 ANO">3º ANO</option>
+                                    <option value="1 TEC">1º TEC</option><option value="2 TEC">2º TEC</option><option value="3 TEC">3º TEC</option>
                                 </select>
                                 <select id="alunoTurma" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none">
-                                    <option value="SISTEMAS">SISTEMAS</option><option value="AUTOMAÇÃO">AUTOMAÇÃO</option>
-                                    <option value="A">TURMA A</option><option value="B">TURMA B</option><option value="C">TURMA C</option>
-                                    <option value="D">TURMA D</option><option value="E">TURMA E</option><option value="F">TURMA F</option><option value="G">TURMA G</option>
+                                    <option value="A">TURMA A</option><option value="B">TURMA B</option><option value="SISTEMAS">SISTEMAS</option>
                                 </select>
                             </div>
-
-                            <select id="alunoPeriodo" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 text-[10px] font-black uppercase outline-none">
-                                <option value="Manhã">MANHÃ (07:05)</option><option value="Tarde">TARDE (13:05)</option>
-                            </select>
-
-                            <button type="submit" class="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black uppercase text-[10px] tracking-widest shadow-xl transition-all hover:bg-indigo-500">Salvar Dados</button>
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black uppercase text-[10px] tracking-widest shadow-xl">Salvar Dados</button>
                         </form>
                     </div>
                     <div class="lg:col-span-8 bg-black/20 border border-white/10 rounded-[3.5rem] overflow-hidden">
                         <table class="w-full text-left">
                             <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
-                                <tr><th class="p-6">Nome</th><th class="p-6">Série/Turma</th><th class="p-6">Turno</th><th class="p-6 text-right">Controle</th></tr>
+                                <tr><th class="p-6">Nome</th><th class="p-6">Série/Turma</th><th class="p-6 text-right">Ação</th></tr>
                             </thead>
                             <tbody id="listaAlunos" class="text-sm font-bold text-slate-300"></tbody>
                         </table>
@@ -121,31 +111,29 @@
             </section>
 
             <section id="aba-atrasos" class="tab-content hidden animate-3d-entry">
-<div class="grid gap-3 mb-8">
-    <label class="radio-ent"><input type="radio" name="motivo" value="Transporte" onclick="toggleJustificativa(false)"><span>Transporte</span></label>
-    <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal" onclick="toggleJustificativa(false)"><span>Pessoal</span></label>
-    <label class="radio-ent"><input type="radio" name="motivo" value="Saúde" onclick="toggleJustificativa(false)"><span>Saúde</span></label>
-    <label class="radio-ent"><input type="radio" name="motivo" value="Outros" id="radioOutros" onclick="toggleJustificativa(true)"><span>Outros</span></label>
-    
-    <input type="text" id="justificativaOutros" placeholder="DESCREVA O MOTIVO..." 
-           class="hidden w-full p-4 rounded-2xl bg-black/40 border border-indigo-500/50 text-xs font-bold uppercase outline-none mt-2 animate-pulse">
-</div>
-                        <div class="relative">
-                            <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="BUSCAR ALUNO PELO NOME..." class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 outline-none text-lg font-bold uppercase focus:border-indigo-500">
-                            <div id="resultadoBusca" class="absolute z-50 w-full mt-2 bg-[#0f172a] rounded-3xl overflow-hidden hidden border border-white/10 shadow-2xl"></div>
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="p-10 rounded-[3.5rem] bg-white/5 border border-white/10 text-center">
+                            <p id="horaAtual" class="text-7xl font-black text-white italic tracking-tighter tabular-nums">00:00:00</p>
                         </div>
+                        <input type="text" id="searchAluno" oninput="buscarAluno()" placeholder="BUSCAR ALUNO PELO NOME..." class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 outline-none text-lg font-bold uppercase">
+                        <div id="resultadoBusca" class="bg-slate-900 rounded-3xl overflow-hidden border border-white/10 hidden"></div>
                     </div>
+                    
                     <div id="formAtrasoContainer" class="hidden">
                         <div class="bg-white/5 p-12 rounded-[4rem] border border-white/10 shadow-2xl relative">
-                            <div id="statusAlerta" class="hidden absolute top-8 right-8 px-4 py-2 bg-red-600 text-white text-[8px] font-black uppercase rounded-full animate-pulse">Atraso Recorrente</div>
                             <h3 id="nomeAlunoSelecionado" class="text-3xl font-black uppercase text-white mb-2 italic"></h3>
                             <p id="infoAlunoSelecionado" class="text-[10px] text-indigo-400 font-black uppercase mb-8"></p>
+                            
                             <div class="grid gap-3 mb-8">
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Transporte"><span>Transporte</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal"><span>Pessoal</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Saúde"><span>Saúde</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Outros"><span>Outros</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Transporte" onclick="toggleJustificativa(false)"><span>Transporte</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal" onclick="toggleJustificativa(false)"><span>Pessoal</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Outros" onclick="toggleJustificativa(true)"><span>Outros</span></label>
+                                
+                                <input type="text" id="justificativaOutros" placeholder="DESCREVA O MOTIVO AQUI..." 
+                                       class="hidden w-full p-5 rounded-2xl bg-black/60 border border-indigo-500/50 text-xs font-bold uppercase outline-none mt-2">
                             </div>
+                            
                             <button onclick="salvarAtraso()" class="w-full py-6 rounded-3xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50 transition-all">Validar Entrada</button>
                         </div>
                     </div>
@@ -156,41 +144,219 @@
                 <div class="bg-black/20 border border-white/10 rounded-[3.5rem] overflow-hidden">
                     <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
                         <h2 class="text-xl font-black uppercase italic">Registros Escolares</h2>
-                        <input type="text" id="filtroHistorico" oninput="renderizarHistorico()" placeholder="Filtrar por nome..." class="p-3 bg-black/40 border border-white/10 rounded-xl text-xs outline-none focus:border-indigo-500">
+                        <button onclick="exportarPDF('historico')" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-[9px] font-black uppercase transition-all">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Exportar Histórico PDF
+                        </button>
                     </div>
                     <table class="w-full text-left">
                         <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
-                            <tr><th class="p-6">Data/Hora</th><th class="p-6">Estudante</th><th class="p-6">Turma</th><th class="p-6">Motivo</th><th class="p-6 text-right">Ação</th></tr>
+                            <tr><th class="p-6">Data/Hora</th><th class="p-6">Estudante</th><th class="p-6">Turma</th><th class="p-6">Motivo</th><th class="p-6 text-right">Status</th></tr>
                         </thead>
                         <tbody id="corpoHistorico" class="text-sm font-bold text-slate-300"></tbody>
                     </table>
                 </div>
             </section>
 
-            <section id="aba-admin" class="tab-content hidden animate-3d-entry">
-                <div class="grid lg:grid-cols-2 gap-10">
-                    <div class="bg-white/5 border border-white/10 p-10 rounded-[3.5rem]">
-                        <h2 class="text-xl font-black uppercase text-red-500 mb-8 italic">Gestão de Operadores</h2>
-                        <form id="formNovoGestor" class="space-y-4 mb-10">
-                            <input type="text" id="newUserName" placeholder="NOME DO OPERADOR" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 outline-none font-bold text-xs uppercase">
-                            <input type="password" id="newUserPass" placeholder="SENHA" class="w-full p-5 rounded-2xl bg-black/40 border border-white/10 outline-none font-bold text-xs">
-                            <button type="submit" class="w-full py-5 rounded-2xl bg-red-600 text-white font-black uppercase text-[10px] tracking-widest">Ativar Staff</button>
-                        </form>
-                        <div class="rounded-3xl border border-white/5 overflow-hidden">
-                            <table class="w-full text-left">
-                                <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
-                                    <tr><th class="p-6">Usuário</th><th class="p-6 text-right">Status</th></tr>
-                                </thead>
-                                <tbody id="listaGestores"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // ESTADO DA APLICAÇÃO
+        let alunos = JSON.parse(localStorage.getItem('pv_alunos')) || [];
+        let historico = JSON.parse(localStorage.getItem('pv_historico')) || [];
+        let alunoSelecionado = null;
+
+        // INICIALIZAÇÃO
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            atualizarDashboard();
+            setInterval(atualizarRelogio, 1000);
+        });
+
+        // LOGIN SIMPLES
+        function login() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+        }
+
+        // NAVEGAÇÃO
+        function navTo(abaId) {
+            document.querySelectorAll('.tab-content').forEach(b => b.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(abaId).classList.remove('hidden');
+            event.currentTarget.classList.add('active');
+            
+            if(abaId === 'aba-alunos') renderizarAlunos();
+            if(abaId === 'aba-historico') renderizarHistorico();
+        }
+
+        // GESTÃO DE ALUNOS
+        document.getElementById('formAluno').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const novo = {
+                id: Date.now(),
+                nome: document.getElementById('alunoNome').value.toUpperCase(),
+                serie: document.getElementById('alunoSerie').value,
+                turma: document.getElementById('alunoTurma').value
+            };
+            alunos.push(novo);
+            localStorage.setItem('pv_alunos', JSON.stringify(alunos));
+            e.target.reset();
+            renderizarAlunos();
+            atualizarDashboard();
+        });
+
+        function renderizarAlunos() {
+            const lista = document.getElementById('listaAlunos');
+            lista.innerHTML = alunos.map(a => `
+                <tr class="border-b border-white/5">
+                    <td class="p-6">${a.nome}</td>
+                    <td class="p-6">${a.serie} - ${a.turma}</td>
+                    <td class="p-6 text-right">
+                        <button onclick="removerAluno(${a.id})" class="text-red-500 text-[10px] uppercase font-black">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function removerAluno(id) {
+            alunos = alunos.filter(a => a.id !== id);
+            localStorage.setItem('pv_alunos', JSON.stringify(alunos));
+            renderizarAlunos();
+            atualizarDashboard();
+        }
+
+        // PORTARIA & BUSCA
+        function buscarAluno() {
+            const termo = document.getElementById('searchAluno').value.toUpperCase();
+            const res = document.getElementById('resultadoBusca');
+            if(termo.length < 2) { res.classList.add('hidden'); return; }
+
+            const filtrados = alunos.filter(a => a.nome.includes(termo));
+            res.innerHTML = filtrados.map(a => `
+                <div onclick="selecionarAluno(${a.id})" class="p-4 hover:bg-indigo-600 cursor-pointer border-b border-white/5 transition-all">
+                    <p class="font-black text-xs">${a.nome}</p>
+                    <p class="text-[9px] opacity-60">${a.serie} | ${a.turma}</p>
+                </div>
+            `).join('');
+            res.classList.remove('hidden');
+        }
+
+        function selecionarAluno(id) {
+            alunoSelecionado = alunos.find(a => a.id === id);
+            document.getElementById('nomeAlunoSelecionado').innerText = alunoSelecionado.nome;
+            document.getElementById('infoAlunoSelecionado').innerText = `${alunoSelecionado.serie} • TURMA ${alunoSelecionado.turma}`;
+            document.getElementById('formAtrasoContainer').classList.remove('hidden');
+            document.getElementById('resultadoBusca').classList.add('hidden');
+            document.getElementById('searchAluno').value = '';
+        }
+
+        function toggleJustificativa(show) {
+            const campo = document.getElementById('justificativaOutros');
+            if(show) {
+                campo.classList.remove('hidden');
+                campo.focus();
+            } else {
+                campo.classList.add('hidden');
+                campo.value = '';
+            }
+        }
+
+        function salvarAtraso() {
+            const radio = document.querySelector('input[name="motivo"]:checked');
+            if(!radio) return alert("Selecione um motivo");
+
+            let motivoFinal = radio.value;
+            if(motivoFinal === 'Outros') {
+                const desc = document.getElementById('justificativaOutros').value;
+                motivoFinal = desc ? `OUTROS: ${desc.toUpperCase()}` : 'OUTROS (SEM DESCRIÇÃO)';
+            }
+
+            const registro = {
+                dataHora: new Date().toLocaleString(),
+                nome: alunoSelecionado.nome,
+                turma: `${alunoSelecionado.serie} ${alunoSelecionado.turma}`,
+                motivo: motivoFinal
+            };
+
+            historico.unshift(registro);
+            localStorage.setItem('pv_historico', JSON.stringify(historico));
+            
+            // Feedback e Reset
+            alert("Entrada Registrada com Sucesso!");
+            document.getElementById('formAtrasoContainer').classList.add('hidden');
+            toggleJustificativa(false);
+            atualizarDashboard();
+        }
+
+        // HISTÓRICO
+        function renderizarHistorico() {
+            const corpo = document.getElementById('corpoHistorico');
+            corpo.innerHTML = historico.map(h => `
+                <tr class="border-b border-white/5">
+                    <td class="p-6 text-xs text-slate-500">${h.dataHora}</td>
+                    <td class="p-6 uppercase">${h.nome}</td>
+                    <td class="p-6 text-[10px]">${h.turma}</td>
+                    <td class="p-6 text-indigo-400 italic text-xs">${h.motivo}</td>
+                    <td class="p-6 text-right text-green-500 text-[10px]">VALIDADO</td>
+                </tr>
+            `).join('');
+        }
+
+        // PDF & EXPORTAÇÃO
+        function exportarPDF(tipo) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const dataDoc = new Date().toLocaleDateString();
+
+            // Cabeçalho Estilizado
+            doc.setFillColor(2, 6, 23);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.text("PV-2026 PRO | RELATÓRIO", 15, 20);
+            doc.setFontSize(10);
+            doc.text(`TIPO: ${tipo.toUpperCase()} | DATA: ${dataDoc}`, 15, 30);
+
+            if(tipo === 'dashboard') {
+                doc.setTextColor(0, 0, 0);
+                doc.text("Resumo de Indicadores:", 15, 50);
+                doc.autoTable({
+                    startY: 55,
+                    head: [['Indicador', 'Valor']],
+                    body: [
+                        ['Alunos Ativos', alunos.length.toString()],
+                        ['Total de Registros de Atraso', historico.length.toString()],
+                        ['Versão do Sistema', '2026.1.0']
+                    ],
+                    theme: 'striped'
+                });
+            } else {
+                const rows = historico.map(h => [h.dataHora, h.nome, h.turma, h.motivo]);
+                doc.autoTable({
+                    startY: 50,
+                    head: [['Data/Hora', 'Aluno', 'Turma', 'Motivo']],
+                    body: rows,
+                    headStyles: { fillColor: [79, 70, 229] },
+                    styles: { fontSize: 8 }
+                });
+            }
+
+            doc.save(`PV2026_${tipo}_${Date.now()}.pdf`);
+        }
+
+        // UTILITÁRIOS
+        function atualizarRelogio() {
+            const agora = new Date();
+            document.getElementById('horaAtual').innerText = agora.toLocaleTimeString('pt-BR');
+        }
+
+        function atualizarDashboard() {
+            document.getElementById('statTotalAlunos').innerText = alunos.length;
+            if(historico.length > 0) {
+                document.getElementById('statTurmaProblema').innerText = historico[0].turma;
+            }
+        }
+    </script>
 </body>
 </html>
