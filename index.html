@@ -121,11 +121,15 @@
             </section>
 
             <section id="aba-atrasos" class="tab-content hidden animate-3d-entry">
-                <div class="grid lg:grid-cols-2 gap-12">
-                    <div class="space-y-6">
-                        <div class="p-10 rounded-[3.5rem] bg-white/5 border border-white/10 text-center">
-                            <p id="horaAtual" class="text-7xl font-black text-white italic tracking-tighter tabular-nums">00:00:00</p>
-                        </div>
+<div class="grid gap-3 mb-8">
+    <label class="radio-ent"><input type="radio" name="motivo" value="Transporte" onclick="toggleJustificativa(false)"><span>Transporte</span></label>
+    <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal" onclick="toggleJustificativa(false)"><span>Pessoal</span></label>
+    <label class="radio-ent"><input type="radio" name="motivo" value="Saúde" onclick="toggleJustificativa(false)"><span>Saúde</span></label>
+    <label class="radio-ent"><input type="radio" name="motivo" value="Outros" id="radioOutros" onclick="toggleJustificativa(true)"><span>Outros</span></label>
+    
+    <input type="text" id="justificativaOutros" placeholder="DESCREVA O MOTIVO..." 
+           class="hidden w-full p-4 rounded-2xl bg-black/40 border border-indigo-500/50 text-xs font-bold uppercase outline-none mt-2 animate-pulse">
+</div>
                         <div class="relative">
                             <input type="text" id="searchAluno" oninput="filtrarAlunosAtraso()" placeholder="BUSCAR ALUNO PELO NOME..." class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 outline-none text-lg font-bold uppercase focus:border-indigo-500">
                             <div id="resultadoBusca" class="absolute z-50 w-full mt-2 bg-[#0f172a] rounded-3xl overflow-hidden hidden border border-white/10 shadow-2xl"></div>
