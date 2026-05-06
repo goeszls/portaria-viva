@@ -1,228 +1,167 @@
-let currentUser = null;
-let selectedAluno = null;
-let myChart = null;
+// --- ESTADO GLOBAL ---
+let alunos = JSON.parse(localStorage.getItem('pv_alunos')) || [];
+let historico = JSON.parse(localStorage.getItem('pv_historico')) || [];
+let alunoSelecionado = null;
 
-const Database = {
-    async save(key, data) { localStorage.setItem('pv_data_' + key, JSON.stringify(data)); },
-    async load(key) { return JSON.parse(localStorage.getItem('pv_data_' + key) || '[]'); }
-};
-
+// --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
-    atualizarRelogio();
-    carregarAlunos();
+    setInterval(atualizarRelogio, 1000);
+    atualizarDashboard();
+});
+
+function atualizarRelogio() {
+    const el = document.getElementById('horaAtual');
+    if(el) el.innerText = new Date().toLocaleTimeString('pt-BR');
+}
+
+// --- AUTENTICAÇÃO E NAVEGAÇÃO ---
+function login() {
+    document.getElementById('authSection').classList.add('hidden');
+    document.getElementById('mainDashboard').classList.remove('hidden');
+}
+
+function navTo(abaId) {
+    document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     
-    document.getElementById('formNovoGestor').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const u = document.getElementById('newUserName').value.toUpperCase();
-        const p = document.getElementById('newUserPass').value;
-        if(!u || !p) return;
-        let gestores = await Database.load('gestores');
-        gestores.push({u, p, role: 'staff'});
-        await Database.save('gestores', gestores);
-        e.target.reset();
-        renderizarGestores();
-    });
-});
+    document.getElementById(abaId).classList.remove('hidden');
+    event.currentTarget.classList.add('active');
 
-// LOGIN
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const u = document.getElementById('loginUser').value.toLowerCase();
-    const p = document.getElementById('loginPass').value;
+    if(abaId === 'aba-historico') renderizarHistorico();
+}
 
-    if(u === 'admin' && p === 'admin') {
-        currentUser = {u: 'ADMIN MASTER', role: 'admin'};
-    } else {
-        const gestores = await Database.load('gestores');
-        const g = gestores.find(i => i.u.toLowerCase() === u && i.p === p);
-        if(g) currentUser = g;
-    }
+// --- GESTÃO DE ALUNOS ---
+function adicionarAluno() {
+    const nome = document.getElementById('alunoNome').value.toUpperCase();
+    const turma = document.getElementById('alunoTurma').value.toUpperCase();
+    
+    if(!nome || !turma) return alert("Preencha tudo!");
 
-    if(currentUser) {
-        document.getElementById('authSection').classList.add('hidden');
-        document.getElementById('mainDashboard').classList.remove('hidden');
-        document.getElementById('userStatus').innerText = currentUser.u;
-        if(currentUser.role === 'admin') document.getElementById('navAdmin').classList.remove('hidden');
-        initDashboard();
-    }
-});
+    const novo = { id: Date.now(), nome, turma };
+    alunos.push(novo);
+    localStorage.setItem('pv_alunos', JSON.stringify(alunos));
+    
+    document.getElementById('alunoNome').value = '';
+    document.getElementById('alunoTurma').value = '';
+    atualizarDashboard();
+    alert("Aluno matriculado!");
+}
 
-// BUSCA
-async function filtrarAlunosAtraso() {
-    const busca = document.getElementById('searchAluno').value.toLowerCase();
+// --- PORTARIA ---
+function buscarAluno() {
+    const termo = document.getElementById('searchAluno').value.toUpperCase();
     const res = document.getElementById('resultadoBusca');
-    const alunos = await Database.load('alunos');
-    if(busca.length < 1) return res.classList.add('hidden');
+    
+    if(termo.length < 2) { res.classList.add('hidden'); return; }
 
-    const filtrados = alunos.filter(a => a.nome.toLowerCase().includes(busca));
+    const filtrados = alunos.filter(a => a.nome.includes(termo));
     res.innerHTML = filtrados.map(a => `
-        <div onclick="selecionarAlunoAtraso(${a.id})" class="p-5 hover:bg-indigo-600 cursor-pointer text-xs font-black text-white uppercase border-b border-white/5 flex justify-between transition-colors">
-            <span>${a.nome}</span>
-            <span class="opacity-50">${a.serie} | ${a.turma}</span>
+        <div onclick="selecionarAluno(${a.id})" class="p-5 hover:bg-indigo-600/20 cursor-pointer border-b border-white/5">
+            <p class="font-black text-xs uppercase">${a.nome}</p>
+            <p class="text-[9px] opacity-50 font-bold">${a.turma}</p>
         </div>
     `).join('');
     res.classList.remove('hidden');
 }
 
-async function selecionarAlunoAtraso(id) {
-    const alunos = await Database.load('alunos');
-    const hist = await Database.load('historico');
-    selectedAluno = alunos.find(a => a.id === id);
-    const total = hist.filter(h => h.aluno === selectedAluno.nome).length;
-    
-    document.getElementById('resultadoBusca').classList.add('hidden');
-    document.getElementById('searchAluno').value = "";
-    document.getElementById('nomeAlunoSelecionado').innerText = selectedAluno.nome;
-    document.getElementById('infoAlunoSelecionado').innerText = `${selectedAluno.serie} ${selectedAluno.turma} | TOTAL: ${total} ATRASOS`;
-    document.getElementById('statusAlerta').classList.toggle('hidden', total < 3);
+function selecionarAluno(id) {
+    alunoSelecionado = alunos.find(a => a.id === id);
+    document.getElementById('nomeAlunoSelecionado').innerText = alunoSelecionado.nome;
+    document.getElementById('infoAlunoSelecionado').innerText = `TURMA: ${alunoSelecionado.turma}`;
     document.getElementById('formAtrasoContainer').classList.remove('hidden');
+    document.getElementById('resultadoBusca').classList.add('hidden');
+    document.getElementById('searchAluno').value = '';
 }
 
-// SALVAR ATRASO
-async function salvarAtraso() {
-    const motivo = document.querySelector('input[name="motivo"]:checked')?.value;
-    if(!motivo) return;
+function toggleJustificativa(show) {
+    const campo = document.getElementById('justificativaOutros');
+    campo.classList.toggle('hidden', !show);
+    if(show) campo.focus();
+}
 
-    const hist = await Database.load('historico');
-    hist.push({
-        id: Date.now(),
-        aluno: selectedAluno.nome,
-        serie: selectedAluno.serie,
-        turma: selectedAluno.turma,
-        data: new Date().toLocaleDateString('pt-br'),
-        hora: new Date().toLocaleTimeString('pt-br', {hour: '2-digit', minute:'2-digit'}),
-        operador: currentUser.u,
-        motivo: motivo
-    });
+function salvarAtraso() {
+    const radio = document.querySelector('input[name="motivo"]:checked');
+    if(!radio) return alert("Escolha um motivo!");
+
+    let motivoFinal = radio.value;
+    if(motivoFinal === 'Outros') {
+        const txt = document.getElementById('justificativaOutros').value;
+        motivoFinal = txt ? `OUTROS: ${txt.toUpperCase()}` : "OUTROS (NÃO ESPECIFICADO)";
+    }
+
+    const reg = {
+        dataHora: new Date().toLocaleString('pt-BR'),
+        nome: alunoSelecionado.nome,
+        turma: alunoSelecionado.turma,
+        motivo: motivoFinal
+    };
+
+    historico.unshift(reg);
+    localStorage.setItem('pv_historico', JSON.stringify(historico));
     
-    await Database.save('historico', hist);
+    alert("Entrada registrada!");
     document.getElementById('formAtrasoContainer').classList.add('hidden');
-    initDashboard();
+    document.querySelectorAll('input[name="motivo"]').forEach(r => r.checked = false);
+    toggleJustificativa(false);
 }
 
-// DASHBOARD
-async function initDashboard() {
-    const alunos = await Database.load('alunos');
-    const hist = await Database.load('historico');
-    document.getElementById('statTotalAlunos').innerText = alunos.length;
+// --- EXPORTAÇÃO PDF ---
+function exportarPDF(tipo) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const agora = new Date().toLocaleString();
 
-    // Turma com mais atrasos
-    const turmas = {};
-    hist.forEach(h => {
-        const tag = `${h.serie} ${h.turma}`;
-        turmas[tag] = (turmas[tag] || 0) + 1;
-    });
-    let top = "---";
-    let max = 0;
-    for(let t in turmas) { if(turmas[t] > max) { max = turmas[t]; top = t; } }
-    document.getElementById('statTurmaProblema').innerText = top;
+    // Design do Header do PDF
+    doc.setFillColor(2, 6, 23); // Cor do sistema
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text("PV-2026 PRO | RELATÓRIO", 15, 22);
+    doc.setFontSize(9);
+    doc.text(`GERADO EM: ${agora} | TIPO: ${tipo.toUpperCase()}`, 15, 32);
 
-    // Alertas Alunos
-    const contagem = {};
-    hist.forEach(h => contagem[h.aluno] = (contagem[h.aluno] || 0) + 1);
-    const riscont = document.getElementById('riscoContainer');
-    riscont.innerHTML = "";
-    Object.keys(contagem).forEach(n => {
-        if(contagem[n] >= 3) {
-            riscont.innerHTML += `<div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[9px] font-black uppercase text-white flex justify-between items-center animate-pulse">${n} (${contagem[n]}) <i data-lucide="alert-triangle" class="w-3 h-3 text-red-500"></i></div>`;
-        }
-    });
+    if(tipo === 'dashboard') {
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(14);
+        doc.text("SUMÁRIO EXECUTIVO", 15, 55);
+        doc.autoTable({
+            startY: 60,
+            head: [['Métrica', 'Valor']],
+            body: [
+                ['Total de Alunos Matriculados', alunos.length],
+                ['Total de Atrasos Registrados', historico.length],
+                ['Status do Servidor', 'Operacional'],
+                ['Licença', 'PV-2026 Enterprise']
+            ],
+            theme: 'grid'
+        });
+    } else {
+        const dados = historico.map(h => [h.dataHora, h.nome, h.turma, h.motivo]);
+        doc.autoTable({
+            startY: 50,
+            head: [['Data/Hora', 'Estudante', 'Turma', 'Motivo da Entrada']],
+            body: dados,
+            headStyles: { fillColor: [79, 70, 229] },
+            styles: { fontSize: 8 }
+        });
+    }
 
-    const ctx = document.getElementById('chartAtrasos').getContext('2d');
-    if(myChart) myChart.destroy();
-    myChart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: ['S', 'T', 'Q', 'Q', 'S'], datasets: [{ data: [12, 19, 8, 15, 6], backgroundColor: '#6366f1' }] },
-        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 8 } } } } }
-    });
-    lucide.createIcons();
+    doc.save(`Relatorio_${tipo}_${Date.now()}.pdf`);
 }
 
-// HISTÓRICO
-async function renderizarHistorico() {
-    const hist = (await Database.load('historico')).reverse();
-    const filtro = document.getElementById('filtroHistorico').value.toLowerCase();
+function renderizarHistorico() {
     const corpo = document.getElementById('corpoHistorico');
-    
-    corpo.innerHTML = hist.filter(h => h.aluno.toLowerCase().includes(filtro)).map(h => `
+    corpo.innerHTML = historico.map(h => `
         <tr class="border-b border-white/5">
-            <td class="p-6 text-[10px] text-slate-500 font-mono">${h.data} ${h.hora}</td>
-            <td class="p-6 text-xs text-white uppercase">${h.aluno}</td>
-            <td class="p-6 text-[10px] font-black uppercase text-indigo-400">${h.serie} ${h.turma}</td>
-            <td class="p-6 text-[10px] text-slate-400 font-bold">${h.motivo}</td>
-            <td class="p-6 text-right">
-                ${currentUser.role === 'admin' ? `<button onclick="removerItemHistorico(${h.id})" class="text-red-500 hover:scale-110 transition-transform"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : `<i data-lucide="lock" class="w-3 h-3 text-slate-700"></i>`}
-            </td>
+            <td class="p-6 text-[10px] text-slate-500">${h.dataHora}</td>
+            <td class="p-6 uppercase">${h.nome}</td>
+            <td class="p-6 uppercase">${h.turma}</td>
+            <td class="p-6 text-indigo-400 italic">${h.motivo}</td>
         </tr>
     `).join('');
-    lucide.createIcons();
 }
 
-async function removerItemHistorico(id) {
-    let hist = await Database.load('historico');
-    hist = hist.filter(h => h.id !== id);
-    await Database.save('historico', hist);
-    renderizarHistorico();
-    initDashboard();
+function atualizarDashboard() {
+    document.getElementById('statTotalAlunos').innerText = alunos.length;
 }
-
-// ALUNOS
-document.getElementById('formAluno').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nome = document.getElementById('alunoNome').value;
-    if(!nome) return;
-    const a = { id: Date.now(), nome, serie: document.getElementById('alunoSerie').value, turma: document.getElementById('alunoTurma').value, periodo: document.getElementById('alunoPeriodo').value };
-    let l = await Database.load('alunos');
-    l.push(a);
-    await Database.save('alunos', l);
-    carregarAlunos();
-    e.target.reset();
-});
-
-async function carregarAlunos() {
-    const l = await Database.load('alunos');
-    document.getElementById('listaAlunos').innerHTML = l.map(a => `
-        <tr class="border-b border-white/5">
-            <td class="p-6 text-xs font-black text-white uppercase">${a.nome}</td>
-            <td class="p-6 text-[10px] text-slate-500 font-bold">${a.serie} / ${a.turma}</td>
-            <td class="p-6 text-[9px] font-black uppercase text-indigo-400">${a.periodo}</td>
-            <td class="p-6 text-right">
-                ${currentUser?.role === 'admin' ? `<button onclick="removerAluno(${a.id})" class="text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : `<i data-lucide="lock" class="w-4 h-4 text-slate-800"></i>`}
-            </td>
-        </tr>
-    `).join('');
-    lucide.createIcons();
-}
-
-async function removerAluno(id) {
-    let l = await Database.load('alunos');
-    l = l.filter(a => a.id !== id);
-    await Database.save('alunos', l);
-    carregarAlunos();
-}
-
-function navTo(id, e) {
-    if(e) e.preventDefault();
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'bg-indigo-600', 'text-white'));
-    document.getElementById(id).classList.remove('hidden');
-    if(e) e.currentTarget.classList.add('active', 'bg-indigo-600', 'text-white');
-    if(id === 'aba-dash') initDashboard();
-    if(id === 'aba-historico') renderizarHistorico();
-    if(id === 'aba-admin') renderizarGestores();
-}
-
-function atualizarRelogio() {
-    const h = document.getElementById('horaAtual');
-    if(h) h.innerText = new Date().toLocaleTimeString('pt-br');
-    setTimeout(atualizarRelogio, 1000);
-}
-
-async function renderizarGestores() {
-    const g = await Database.load('gestores');
-    document.getElementById('listaGestores').innerHTML = g.map(i => `<tr class="border-b border-white/5"><td class="p-6 text-[10px] font-black text-white">${i.u}</td><td class="p-6 text-right text-green-500 font-black text-[9px]">ATIVO</td></tr>`).join('');
-}
-
-function exportarPDF() { /* Implementação idêntica à anterior */ }
-function logout() { location.reload(); }
