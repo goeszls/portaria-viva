@@ -23,7 +23,7 @@
                 <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2 italic">Controle Escolar</p>
             </div>
             <div class="space-y-4">
-                <input type="text" id="loginUser" placeholder="USUÁRIO" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold">
+                <input type="text" id="loginUser" placeholder="USUÁRIO" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold uppercase">
                 <input type="password" id="loginPass" placeholder="SENHA" class="w-full p-5 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500 text-sm font-bold">
                 <button onclick="login()" class="w-full py-5 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all">Acessar Painel</button>
             </div>
@@ -37,8 +37,9 @@
                 <button onclick="navTo('aba-alunos')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase">Matrícula</button>
                 <button onclick="navTo('aba-atrasos')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase">Portaria</button>
                 <button onclick="navTo('aba-historico')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase">Histórico</button>
+                <button onclick="navTo('aba-gestor')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase text-indigo-400">Gestor</button>
             </nav>
-            <button onclick="location.reload()" class="p-4 bg-white/5 border border-white/10 text-red-500 rounded-2xl"><i data-lucide="power"></i></button>
+            <button onclick="location.reload()" class="p-4 bg-white/5 border border-white/10 text-red-500 rounded-2xl hover:bg-red-500/10 transition-colors"><i data-lucide="power"></i></button>
         </header>
 
         <main class="max-w-[1600px] mx-auto">
@@ -50,12 +51,43 @@
                     </div>
                     <div class="lg:col-span-3 bg-white/5 border border-white/10 rounded-[3.5rem] p-8 flex justify-between items-center">
                         <div>
-                            <h3 class="text-xl font-black uppercase italic">Relatório Geral</h3>
+                            <h3 class="text-xl font-black uppercase italic text-white">Relatório Geral</h3>
                             <p class="text-slate-500 text-xs">Gere o PDF com as métricas atuais do sistema.</p>
                         </div>
-                        <button onclick="exportarPDF('dashboard')" class="bg-indigo-600 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500">
-                            Exportar Dashboard
-                        </button>
+                        <button onclick="exportarPDF('dashboard')" class="bg-indigo-600 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500">Exportar Dashboard</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="aba-alunos" class="tab-content hidden animate-3d-entry">
+                <div class="bg-white/5 p-10 rounded-[3rem] border border-white/10">
+                    <h2 class="text-xl font-black mb-6 uppercase italic text-white">Cadastro de Estudante</h2>
+                    <div class="flex flex-wrap gap-4">
+                        <input type="text" id="alunoNome" placeholder="NOME COMPLETO" class="bg-black/40 p-4 rounded-xl border border-white/10 flex-1 uppercase outline-none focus:border-indigo-500 font-bold text-xs">
+                        
+                        <select id="alunoSerie" class="bg-black/40 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-slate-300 font-bold text-xs">
+                            <option value="" disabled selected>SÉRIE</option>
+                            <optgroup label="Ensino Fundamental">
+                                <option value="6">6º ANO</option><option value="7">7º ANO</option>
+                                <option value="8">8º ANO</option><option value="9">9º ANO</option>
+                            </optgroup>
+                            <optgroup label="Ensino Médio">
+                                <option value="1">1º ANO</option><option value="2">2º ANO</option>
+                                <option value="3">3º ANO</option>
+                            </optgroup>
+                            <optgroup label="Técnico">
+                                <option value="1º TEC">1º TEC</option><option value="2º TEC">2º TEC</option>
+                                <option value="3º TEC">3º TEC</option>
+                            </optgroup>
+                        </select>
+
+                        <select id="alunoTurma" class="bg-black/40 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-slate-300 font-bold text-xs">
+                            <option value="" disabled selected>TURMA</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                            <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+                        </select>
+
+                        <button onclick="adicionarAluno()" class="bg-indigo-600 px-8 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500">Salvar</button>
                     </div>
                 </div>
             </section>
@@ -69,21 +101,15 @@
                         <input type="text" id="searchAluno" oninput="buscarAluno()" placeholder="BUSCAR ALUNO..." class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 outline-none text-lg font-bold uppercase focus:border-indigo-500">
                         <div id="resultadoBusca" class="bg-slate-900 rounded-3xl border border-white/10 hidden max-h-60 overflow-y-auto"></div>
                     </div>
-                    
                     <div id="formAtrasoContainer" class="hidden">
                         <div class="bg-white/5 p-12 rounded-[4rem] border border-white/10 shadow-2xl">
                             <h3 id="nomeAlunoSelecionado" class="text-3xl font-black uppercase text-white mb-2 italic"></h3>
                             <p id="infoAlunoSelecionado" class="text-[10px] text-indigo-400 font-black uppercase mb-8"></p>
-                            
                             <div class="grid gap-3 mb-8">
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Transporte" onclick="toggleJustificativa(false)"><span>Transporte</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal" onclick="toggleJustificativa(false)"><span>Pessoal</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Outros" onclick="toggleJustificativa(true)"><span>Outros</span></label>
-                                
-                                <input type="text" id="justificativaOutros" placeholder="DESCREVA O MOTIVO..." 
-                                       class="hidden w-full p-5 rounded-2xl bg-black/60 border border-indigo-500 text-xs font-bold uppercase outline-none mt-2">
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Transporte"><span>Transporte</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal"><span>Pessoal</span></label>
+                                <label class="radio-ent"><input type="radio" name="motivo" value="Outros"><span>Outros</span></label>
                             </div>
-                            
                             <button onclick="salvarAtraso()" class="w-full py-6 rounded-3xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50">Validar Entrada</button>
                         </div>
                     </div>
@@ -93,10 +119,8 @@
             <section id="aba-historico" class="tab-content hidden animate-3d-entry">
                 <div class="bg-black/20 border border-white/10 rounded-[3.5rem] overflow-hidden">
                     <div class="p-8 flex justify-between items-center bg-white/5 border-b border-white/5">
-                        <h2 class="text-xl font-black uppercase italic">Registros de Portaria</h2>
-                        <button onclick="exportarPDF('historico')" class="bg-red-600 px-6 py-3 rounded-xl font-black text-[9px] uppercase hover:bg-red-500">
-                            Exportar Histórico PDF
-                        </button>
+                        <h2 class="text-xl font-black uppercase italic text-white">Registros de Portaria</h2>
+                        <button onclick="exportarPDF('historico')" class="bg-red-600 px-6 py-3 rounded-xl font-black text-[9px] uppercase hover:bg-red-500">Exportar PDF</button>
                     </div>
                     <table class="w-full text-left">
                         <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
@@ -107,13 +131,29 @@
                 </div>
             </section>
 
-            <section id="aba-alunos" class="tab-content hidden animate-3d-entry">
-                <div class="bg-white/5 p-10 rounded-[3rem] border border-white/10">
-                    <h2 class="text-xl font-black mb-6 uppercase italic">Cadastro Rápido</h2>
-                    <div class="flex gap-4">
-                        <input type="text" id="alunoNome" placeholder="NOME" class="bg-black/40 p-4 rounded-xl border border-white/10 flex-1 uppercase">
-                        <input type="text" id="alunoTurma" placeholder="TURMA" class="bg-black/40 p-4 rounded-xl border border-white/10 w-32 uppercase">
-                        <button onclick="adicionarAluno()" class="bg-indigo-600 px-6 rounded-xl font-bold uppercase text-xs">Salvar</button>
+            <section id="aba-gestor" class="tab-content hidden animate-3d-entry">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="bg-white/5 p-8 rounded-[3rem] border border-white/10">
+                        <h2 class="text-lg font-black mb-6 uppercase italic text-white">Novo Funcionário</h2>
+                        <div class="space-y-4">
+                            <input type="text" id="newStaffUser" placeholder="USUÁRIO" class="w-full bg-black/40 p-4 rounded-xl border border-white/10 uppercase font-bold text-xs outline-none focus:border-indigo-500">
+                            <input type="password" id="newStaffPass" placeholder="SENHA" class="w-full bg-black/40 p-4 rounded-xl border border-white/10 font-bold text-xs outline-none focus:border-indigo-500">
+                            <select id="newStaffRole" class="w-full bg-black/40 p-4 rounded-xl border border-white/10 font-bold text-xs text-slate-400 outline-none">
+                                <option value="PORTARIA">PORTARIA</option>
+                                <option value="SECRETARIA">SECRETARIA</option>
+                                <option value="GESTOR">GESTOR / ADMIN</option>
+                            </select>
+                            <button onclick="criarFuncionario()" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50 transition-all">Cadastrar Acesso</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 bg-black/20 border border-white/10 rounded-[3rem] overflow-hidden">
+                        <div class="p-6 bg-white/5 border-b border-white/5 text-white font-black uppercase italic">Equipe Cadastrada</div>
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
+                                <tr><th class="p-4">Usuário</th><th class="p-4">Cargo</th><th class="p-4 text-right">Ações</th></tr>
+                            </thead>
+                            <tbody id="corpoGestor" class="text-xs font-bold text-slate-300"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
