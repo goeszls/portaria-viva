@@ -43,6 +43,7 @@
         </div>
     </div>
 
+    <!-- Seção de Login -->
     <div id="authSection" class="min-h-screen flex items-center justify-center p-6">
         <div class="bg-white/5 backdrop-blur-2xl border border-white/10 w-full max-w-md rounded-[3rem] p-10 shadow-2xl text-center">
             <div class="mb-10">
@@ -60,6 +61,7 @@
         </div>
     </div>
 
+    <!-- Dashboard Principal -->
     <div id="mainDashboard" class="hidden p-6 md:p-10">
         <header class="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between items-center mb-10 gap-6">
             <nav class="flex gap-2 bg-black/40 backdrop-blur-xl p-2 rounded-[2.5rem] border border-white/10 shadow-2xl overflow-x-auto w-full lg:w-auto">
@@ -67,13 +69,17 @@
                 <button onclick="navTo('aba-alunos')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Matrícula</button>
                 <button onclick="navTo('aba-atrasos')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Portaria</button>
                 <button onclick="navTo('aba-historico')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase whitespace-nowrap">Histórico</button>
-                <button onclick="navTo('aba-usuarios')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase text-amber-400 whitespace-nowrap">Usuários</button>
-                <button onclick="navTo('aba-gestao-dados')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase text-emerald-400 whitespace-nowrap">Dados</button>
+                <button id="btn-nav-usuarios" onclick="navTo('aba-usuarios')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase text-amber-400 whitespace-nowrap">Usuários</button>
+                <button id="btn-nav-dados" onclick="navTo('aba-gestao-dados')" class="nav-btn px-6 py-4 rounded-2xl font-black text-[10px] uppercase text-emerald-400 whitespace-nowrap">Dados</button>
             </nav>
-            <button onclick="logout()" class="p-4 bg-white/5 border border-white/10 text-red-500 rounded-2xl hover:bg-red-500/10 transition-all"><i data-lucide="power"></i></button>
+            <div class="flex items-center gap-4">
+                <div id="userBadge" class="bg-white/10 px-4 py-2 rounded-full border border-white/10 text-[9px] font-black uppercase text-indigo-400 italic"></div>
+                <button onclick="logout()" class="p-4 bg-white/5 border border-white/10 text-red-500 rounded-2xl hover:bg-red-500/10 transition-all"><i data-lucide="power"></i></button>
+            </div>
         </header>
 
         <main class="max-w-[1600px] mx-auto">
+            <!-- DASHBOARD -->
             <section id="aba-dash" class="tab-content animate-3d-entry">
                 <div class="grid lg:grid-cols-4 gap-6 mb-8">
                     <div class="bg-indigo-600 p-8 rounded-[3rem] shadow-2xl">
@@ -90,8 +96,9 @@
                 </div>
             </section>
 
+            <!-- MATRÍCULA -->
             <section id="aba-alunos" class="tab-content hidden animate-3d-entry">
-                <div class="bg-white/5 p-10 rounded-[3rem] border border-white/10">
+                <div id="container-matricula" class="bg-white/5 p-10 rounded-[3rem] border border-white/10">
                     <h2 class="text-xl font-black mb-6 uppercase italic text-white">Nova Matrícula</h2>
                     <div class="flex flex-wrap gap-4">
                         <input type="text" id="alunoNome" placeholder="NOME COMPLETO" class="bg-black/40 p-4 rounded-xl border border-white/10 flex-1 uppercase font-bold text-xs outline-none focus:border-indigo-500">
@@ -109,30 +116,36 @@
                             <option value="E">E</option><option value="F">F</option>
                             <option value="G">G</option>
                         </select>
-                        <button onclick="adicionarAluno()" class="bg-indigo-600 px-8 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 transition-all">Salvar</button>
+                        <button id="btn-salvar-aluno" onclick="adicionarAluno()" class="bg-indigo-600 px-8 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 transition-all">Salvar</button>
                     </div>
                 </div>
             </section>
 
+            <!-- USUÁRIOS -->
             <section id="aba-usuarios" class="tab-content hidden animate-3d-entry">
                 <div class="bg-white/5 p-10 rounded-[3rem] border border-white/10 mb-8">
                     <h2 class="text-xl font-black mb-6 uppercase italic text-white">Criar Novo Operador</h2>
                     <div class="flex flex-wrap gap-4">
                         <input type="text" id="newUserName" placeholder="NOME DO USUÁRIO" class="bg-black/40 p-4 rounded-xl border border-white/10 flex-1 uppercase font-bold text-xs outline-none focus:border-indigo-500">
                         <input type="password" id="newUserPass" placeholder="SENHA" class="bg-black/40 p-4 rounded-xl border border-white/10 flex-1 font-bold text-xs outline-none focus:border-indigo-500">
+                        <select id="newUserRole" class="bg-black/40 p-4 rounded-xl border border-white/10 text-xs font-bold outline-none text-slate-300">
+                            <option value="SIMPLES">SIMPLES (OPERADOR)</option>
+                            <option value="SECRETARIA">SECRETARIA (LEITURA)</option>
+                        </select>
                         <button onclick="criarUsuario()" class="bg-amber-500 px-8 rounded-xl font-black text-black uppercase text-[10px] tracking-widest hover:bg-amber-400 transition-all">Criar Acesso</button>
                     </div>
                 </div>
                 <div class="bg-black/20 border border-white/10 rounded-[3rem] overflow-hidden">
                     <table class="w-full text-left">
                         <thead class="bg-white/5 text-[9px] uppercase font-black text-slate-500">
-                            <tr><th class="p-6">Usuário Ativo</th><th class="p-6 text-right">Ação</th></tr>
+                            <tr><th class="p-6">Usuário Ativo</th><th class="p-6">Hierarquia</th><th class="p-6 text-right">Ação</th></tr>
                         </thead>
                         <tbody id="listaUsuarios" class="text-xs font-bold"></tbody>
                     </table>
                 </div>
             </section>
 
+            <!-- PORTARIA -->
             <section id="aba-atrasos" class="tab-content hidden animate-3d-entry">
                 <div class="grid lg:grid-cols-2 gap-12">
                     <div class="space-y-6">
@@ -146,17 +159,23 @@
                         <div class="bg-white/5 p-12 rounded-[4rem] border border-white/10 shadow-2xl">
                             <h3 id="nomeAlunoSelecionado" class="text-3xl font-black uppercase text-white mb-2 italic"></h3>
                             <p id="infoAlunoSelecionado" class="text-[10px] text-indigo-400 font-black uppercase mb-8"></p>
-                            <div class="grid gap-3 mb-8">
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Transporte"><span>Transporte</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal"><span>Pessoal</span></label>
-                                <label class="radio-ent"><input type="radio" name="motivo" value="Outros"><span>Outros</span></label>
+                            <div id="opcoes-portaria">
+                                <div class="grid gap-3 mb-8">
+                                    <label class="radio-ent"><input type="radio" name="motivo" value="Transporte"><span>Transporte</span></label>
+                                    <label class="radio-ent"><input type="radio" name="motivo" value="Pessoal"><span>Pessoal</span></label>
+                                    <label class="radio-ent"><input type="radio" name="motivo" value="Outros"><span>Outros</span></label>
+                                </div>
+                                <button id="btn-validar-entrada" onclick="salvarAtraso()" class="w-full py-6 rounded-3xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50 transition-all">Validar Entrada</button>
                             </div>
-                            <button onclick="salvarAtraso()" class="w-full py-6 rounded-3xl bg-white text-black font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50 transition-all">Validar Entrada</button>
+                            <div id="msg-readonly-portaria" class="hidden text-center p-6 border border-white/10 rounded-3xl bg-white/5">
+                                <p class="text-amber-500 font-black uppercase text-[10px]">Acesso apenas para consulta</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- HISTÓRICO -->
             <section id="aba-historico" class="tab-content hidden animate-3d-entry">
                 <div class="bg-black/20 border border-white/10 rounded-[3.5rem] overflow-hidden">
                     <div class="p-8 bg-white/5 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -177,6 +196,7 @@
                 </div>
             </section>
 
+            <!-- GESTÃO DE DADOS -->
             <section id="aba-gestao-dados" class="tab-content hidden animate-3d-entry">
                 <div class="grid lg:grid-cols-2 gap-8">
                     <div class="bg-black/20 border border-white/10 rounded-[3rem] overflow-hidden">
@@ -203,18 +223,21 @@
     <script>
         let alunos = JSON.parse(localStorage.getItem('pv_alunos')) || [];
         let historico = JSON.parse(localStorage.getItem('pv_historico')) || [];
-        let usuarios = JSON.parse(localStorage.getItem('pv_users')) || [{u: 'ADMIN', p: '2026'}];
+        let usuarios = JSON.parse(localStorage.getItem('pv_users')) || [{u: 'ADMIN', p: '2026', role: 'MASTER'}];
+        let currentUser = null;
         let alunoSelecionado = null;
         let acaoConfirmacao = null;
         let chartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            atualizarStats();
-            if(localStorage.getItem('pv_session') === 'active') {
-                document.getElementById('authSection').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
+            
+            const savedSession = localStorage.getItem('pv_session_data');
+            if(savedSession) {
+                currentUser = JSON.parse(savedSession);
+                startApp();
             }
+
             setInterval(() => {
                 const el = document.getElementById('horaAtual');
                 if(el) el.innerText = new Date().toLocaleTimeString('pt-BR');
@@ -222,22 +245,45 @@
         });
 
         function login() {
-            const u = document.getElementById('loginUser').value.toUpperCase();
+            const u = document.getElementById('loginUser').value.toUpperCase().trim();
             const p = document.getElementById('loginPass').value;
             const userValid = usuarios.find(user => user.u === u && user.p === p);
+            
             if(userValid) {
-                localStorage.setItem('pv_session', 'active');
-                document.getElementById('authSection').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
+                currentUser = userValid;
+                localStorage.setItem('pv_session_data', JSON.stringify(userValid));
+                startApp();
                 showToast(`Bem-vindo, ${u}!`, 'success');
-                atualizarStats();
             } else {
                 showToast('Acesso negado!', 'error');
             }
         }
 
+        function startApp() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('userBadge').innerText = `${currentUser.u} | ${currentUser.role}`;
+            
+            // Controle de Visibilidade por Hierarquia
+            if(currentUser.role === 'SIMPLES') {
+                document.getElementById('btn-nav-usuarios').classList.add('hidden');
+                document.getElementById('btn-nav-dados').classList.add('hidden');
+            }
+            
+            if(currentUser.role === 'SECRETARIA') {
+                document.getElementById('btn-nav-usuarios').classList.add('hidden');
+                document.getElementById('btn-nav-dados').classList.add('hidden');
+                // Esconde botões de ação nas abas permitidas
+                document.getElementById('btn-salvar-aluno').classList.add('hidden');
+                document.getElementById('opcoes-portaria').classList.add('hidden');
+                document.getElementById('msg-readonly-portaria').classList.remove('hidden');
+            }
+
+            atualizarStats();
+        }
+
         function logout() {
-            localStorage.removeItem('pv_session');
+            localStorage.removeItem('pv_session_data');
             location.reload();
         }
 
@@ -251,6 +297,7 @@
         }
 
         function adicionarAluno() {
+            if(currentUser.role === 'SECRETARIA') return;
             const nome = document.getElementById('alunoNome').value.toUpperCase();
             const serie = document.getElementById('alunoSerie').value;
             const turma = document.getElementById('alunoTurma').value;
@@ -263,11 +310,13 @@
         }
 
         function criarUsuario() {
+            if(currentUser.role !== 'MASTER') return;
             const u = document.getElementById('newUserName').value.toUpperCase().trim();
             const p = document.getElementById('newUserPass').value.trim();
+            const role = document.getElementById('newUserRole').value;
             if(!u || !p) return showToast('Preencha usuário e senha!', 'error');
             if(usuarios.some(user => user.u === u)) return showToast('Usuário já existe!', 'error');
-            usuarios.push({ u, p });
+            usuarios.push({ u, p, role });
             localStorage.setItem('pv_users', JSON.stringify(usuarios));
             document.getElementById('newUserName').value = '';
             document.getElementById('newUserPass').value = '';
@@ -279,9 +328,10 @@
             const lista = document.getElementById('listaUsuarios');
             lista.innerHTML = usuarios.map((user, i) => `
                 <tr class="border-b border-white/5">
-                    <td class="p-6 text-white uppercase">${user.u} ${user.u === 'ADMIN' ? '<span class="text-[8px] bg-white/10 px-2 py-1 rounded ml-2">MASTER</span>' : ''}</td>
+                    <td class="p-6 text-white uppercase">${user.u}</td>
+                    <td class="p-6"><span class="bg-white/10 px-3 py-1 rounded text-[8px]">${user.role}</span></td>
                     <td class="p-6 text-right">
-                        ${user.u !== 'ADMIN' ? `<button onclick="removerUsuario(${i})" class="text-red-500 font-black text-[9px]">REMOVER</button>` : '-'}
+                        ${user.role !== 'MASTER' ? `<button onclick="removerUsuario(${i})" class="text-red-500 font-black text-[9px]">REMOVER</button>` : '-'}
                     </td>
                 </tr>`).join('');
         }
@@ -318,6 +368,7 @@
         }
 
         function salvarAtraso() {
+            if(currentUser.role === 'SECRETARIA') return;
             const mot = document.querySelector('input[name="motivo"]:checked')?.value;
             if(!mot) return showToast('Selecione o motivo!', 'info');
             historico.unshift({ data: new Date().toLocaleString('pt-BR'), nome: alunoSelecionado.nome, turma: alunoSelecionado.turma, motivo: mot });
@@ -378,16 +429,21 @@
             document.getElementById('listaGestaoAlunos').innerHTML = alunos.map((a, i) => `
                 <tr class="border-b border-white/5">
                     <td class="p-4">${a.nome}</td>
-                    <td class="p-4 text-right"><button onclick="excluir('alunos', ${i})" class="text-red-500 font-black text-[9px]">EXCLUIR</button></td>
+                    <td class="p-4 text-right">
+                        ${currentUser.role !== 'SECRETARIA' ? `<button onclick="excluir('alunos', ${i})" class="text-red-500 font-black text-[9px]">EXCLUIR</button>` : '-'}
+                    </td>
                 </tr>`).join('');
             document.getElementById('listaGestaoHistorico').innerHTML = historico.map((h, i) => `
                 <tr class="border-b border-white/5">
                     <td class="p-4">${h.nome} (${h.data})</td>
-                    <td class="p-4 text-right"><button onclick="excluir('historico', ${i})" class="text-red-500 font-black text-[9px]">REMOVER</button></td>
+                    <td class="p-4 text-right">
+                        ${currentUser.role !== 'SECRETARIA' ? `<button onclick="excluir('historico', ${i})" class="text-red-500 font-black text-[9px]">REMOVER</button>` : '-'}
+                    </td>
                 </tr>`).join('');
         }
 
         function excluir(tipo, idx) {
+            if(currentUser.role === 'SECRETARIA') return;
             openModal('Atenção', 'Deseja remover este registro permanentemente?', () => {
                 if(tipo === 'alunos') alunos.splice(idx, 1);
                 else historico.splice(idx, 1);
@@ -416,54 +472,6 @@
 
         function closeModal() { document.getElementById('customModal').classList.add('hidden'); }
         document.getElementById('modalConfirmBtn').onclick = () => { acaoConfirmacao(); closeModal(); };
-
-        // 1. Verificação no Momento do Login
-function processarLogin(user, pass) {
-    const usuarioEncontrado = usuarios.find(u => u.u === user && u.p === pass);
-    
-    if (usuarioEncontrado) {
-        // Guarda a sessão com o nível de hierarquia
-        localStorage.setItem('pv_session_data', JSON.stringify(usuarioEncontrado));
-        aplicarRestricoes(usuarioEncontrado.role);
-    }
-}
-
-// 2. Aplicação das Regras de Interface
-function aplicarRestricoes(role) {
-    // Regras para o utilizador "SIMPLES"
-    if (role === 'SIMPLES') {
-        document.getElementById('nav-usuarios').style.display = 'none';
-        document.getElementById('nav-dados').style.display = 'none';
-    }
-
-    // Regras para a "SECRETARIA"
-    if (role === 'SECRETARIA') {
-        // Bloqueia acesso a gestão de sistema
-        document.getElementById('nav-usuarios').style.display = 'none';
-        document.getElementById('nav-dados').style.display = 'none';
-        
-        // Desativa ações de escrita (Modo Leitura)
-        const botoesAcao = document.querySelectorAll('.btn-acao, button[onclick*="adicionar"], button[onclick*="salvar"]');
-        botoesAcao.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.title = "Acesso apenas de leitura";
-        });
-    }
-}
-
-// 3. Bloqueio de Segurança nas Funções
-function adicionarAluno() {
-    const sessao = JSON.parse(localStorage.getItem('pv_session_data'));
-    
-    if (sessao.role === 'SECRETARIA') {
-        alert("Erro: O seu perfil de Secretaria não permite criar novas matrículas.");
-        return; // Interrompe a função aqui
-    }
-    
-    // ... código para salvar o aluno ...
-                }
-        
     </script>
 </body>
 </html>
