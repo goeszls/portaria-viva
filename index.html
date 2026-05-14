@@ -416,6 +416,54 @@
 
         function closeModal() { document.getElementById('customModal').classList.add('hidden'); }
         document.getElementById('modalConfirmBtn').onclick = () => { acaoConfirmacao(); closeModal(); };
+
+        // 1. Verificação no Momento do Login
+function processarLogin(user, pass) {
+    const usuarioEncontrado = usuarios.find(u => u.u === user && u.p === pass);
+    
+    if (usuarioEncontrado) {
+        // Guarda a sessão com o nível de hierarquia
+        localStorage.setItem('pv_session_data', JSON.stringify(usuarioEncontrado));
+        aplicarRestricoes(usuarioEncontrado.role);
+    }
+}
+
+// 2. Aplicação das Regras de Interface
+function aplicarRestricoes(role) {
+    // Regras para o utilizador "SIMPLES"
+    if (role === 'SIMPLES') {
+        document.getElementById('nav-usuarios').style.display = 'none';
+        document.getElementById('nav-dados').style.display = 'none';
+    }
+
+    // Regras para a "SECRETARIA"
+    if (role === 'SECRETARIA') {
+        // Bloqueia acesso a gestão de sistema
+        document.getElementById('nav-usuarios').style.display = 'none';
+        document.getElementById('nav-dados').style.display = 'none';
+        
+        // Desativa ações de escrita (Modo Leitura)
+        const botoesAcao = document.querySelectorAll('.btn-acao, button[onclick*="adicionar"], button[onclick*="salvar"]');
+        botoesAcao.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.title = "Acesso apenas de leitura";
+        });
+    }
+}
+
+// 3. Bloqueio de Segurança nas Funções
+function adicionarAluno() {
+    const sessao = JSON.parse(localStorage.getItem('pv_session_data'));
+    
+    if (sessao.role === 'SECRETARIA') {
+        alert("Erro: O seu perfil de Secretaria não permite criar novas matrículas.");
+        return; // Interrompe a função aqui
+    }
+    
+    // ... código para salvar o aluno ...
+                }
+        
     </script>
 </body>
 </html>
